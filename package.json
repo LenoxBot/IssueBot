@@ -1,0 +1,17 @@
+{
+  "name": "issuebot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "issuebot.js",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "fs": "^0.0.1-security",
+    "mongodb": "^3.2.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gilles Heinesch",
+  "license": "ISC"
+}

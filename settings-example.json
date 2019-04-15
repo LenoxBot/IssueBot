@@ -1,0 +1,12 @@
+{
+    "token": "Secret token",
+    "owners": [],
+    "administrators": [],
+    "db": {
+        "user": "username",
+		"password": "password",
+		"host": "localhost",
+		"port": "27017"
+    },
+    
+}
