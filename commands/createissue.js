@@ -52,7 +52,7 @@ exports.run = async (client, msg) => {
 
 		msg.channel.send('Bugreport successfully sent! It will now be checked by the Bugreporters');
 
-		const channel = client.channels.get('497392386847014934');
+		const channel = client.channels.get('49739286847014934');
 		const tableload = client.bugreports.get('bugreports');
 		const bugreportembed = new Discord.RichEmbed()
 			.setColor('#ff9900')
