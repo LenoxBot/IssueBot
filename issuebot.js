@@ -4,6 +4,8 @@ const settings = require('./settings.json');
 const mongodb = require('mongodb');
 const fs = require('fs');
 
+client.isMongodbReady = false;
+
 let mongoUrl;
 let dbClient;
 let db;
@@ -11,15 +13,17 @@ async function connectMongoDB() {
 	mongoUrl = `mongodb://${encodeURIComponent(settings.db.user)}:${encodeURIComponent(settings.db.password)}@${encodeURIComponent(settings.db.host)}:${encodeURIComponent(settings.db.port)}/?authMechanism=DEFAULT&authSource=admin`;
 	dbClient = await mongodb.MongoClient.connect(mongoUrl, { useNewUrlParser: true });
 	db = dbClient.db('issuebot');
+
+	client.botSettingsCollection = db.collection('botSettings');
+	client.userSettingsCollection = db.collection('userSettings');
+	client.issuesSettingsCollection = db.collection('issuesSettings');
+
+	client.isMongodbReady = true;
 }
 
 connectMongoDB().catch(error => {
 	console.log(error);
 });
-
-client.botSettingsCollection = db.collection('botSettings');
-client.userSettingsCollection = db.collection('userSettings');
-client.issuesSettingsCollection = db.collection('issuesSettings');
 
 
 process.on('unhandledRejection', reason => {

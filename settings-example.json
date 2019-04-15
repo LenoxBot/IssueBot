@@ -8,5 +8,11 @@
 		"host": "localhost",
 		"port": "27017"
     },
-    
+    "createIssuesChannel": "",
+    "processingBugreportsChannel": "",
+    "processingSuggestionsChannel": "",
+    "deniedBugreportsChannel": "",
+    "deniedSuggestionsChannel": "",
+    "approvedBugreportsChannel": "",
+    "approvedSuggestionsChannel": ""
 }
