@@ -14,9 +14,8 @@ async function connectMongoDB() {
 	dbClient = await mongodb.MongoClient.connect(mongoUrl, { useNewUrlParser: true });
 	db = dbClient.db('issuebot');
 
-	client.botSettingsCollection = db.collection('botSettings');
-	client.userSettingsCollection = db.collection('userSettings');
-	client.issuesSettingsCollection = db.collection('issuesSettings');
+	client.botSettings = db.collection('botSettings');
+	client.userSettings = db.collection('userSettings');
 
 	client.isMongodbReady = true;
 }
