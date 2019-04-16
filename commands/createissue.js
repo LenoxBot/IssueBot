@@ -5,6 +5,7 @@ exports.run = async (client, msg) => {
 	if (msg.guild.id !== settings.lenoxbotDiscordServer) return msg.channel.send('The bugreport must be written to the LenoxBot Discord server!');
 
 	const botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	const userconfs = await client.userSettings.findOne({ userId: msg.author.id });
 
 	const bugreportAnswers = [];
 	const bugreportQuestions = {
@@ -117,6 +118,9 @@ exports.run = async (client, msg) => {
 				.setTitle(`🆕 Bugreport successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
 
 			msg.reply({ embed: issueSent });
+
+			botconfs.settings.totalIssues.bugreports.total += 1;
+			userconfs.settings.totalIssues.bugreports.total += 1;
 		} else {
 			for (let i = 0; i < suggestionQuestions.questions.length; i++) {
 				try {
@@ -158,6 +162,9 @@ exports.run = async (client, msg) => {
 				.setTitle(`🆕 Suggestion successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
 
 			msg.reply({ embed: issueSent });
+
+			botconfs.settings.totalIssues.suggestions.total += 1;
+			userconfs.settings.totalIssues.suggestions.total += 1;
 		}
 
 		const issueSettings = {
@@ -177,6 +184,7 @@ exports.run = async (client, msg) => {
 		botconfs.settings.issues[botconfs.settings.issuescount] = issueSettings;
 
 		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
+		await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { settings: userconfs.settings } });
 	});
 };
 
