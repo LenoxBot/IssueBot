@@ -146,7 +146,7 @@ exports.run = async (client, msg) => {
 			const processingSuggestionsChannel = client.channels.get(settings.processingSuggestionsChannel);
 			const suggestionembed = new Discord.RichEmbed()
 				.setColor('BLUE')
-				.setTitle(`📢 Suggestion reported by ${msg.author.username} (${msg.author.id})`)
+				.setTitle(`📢 Suggestion proposed by ${msg.author.username} (${msg.author.id})`)
 				.setDescription(`This suggestion needs to be approved/declined. \n**🆔: ${botconfs.settings.issuescount}**`);
 
 			for (let index = 0; index < suggestionQuestions.questions.length; index++) {
