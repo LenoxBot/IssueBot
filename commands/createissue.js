@@ -82,7 +82,7 @@ exports.run = async (client, msg) => {
 						.setFooter(`Min. characters: ${bugreportQuestions.questions[i].minChars}, Max. characters: ${bugreportQuestions.questions[i].maxChars}`)
 						.setColor('BLUE');
 
-					await msg.reply({ embed: questionEmbed });
+					const questionMessage = await msg.reply({ embed: questionEmbed });
 					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= bugreportQuestions.questions[i].maxChars && msg2.content.length >= bugreportQuestions.questions[i].minChars, {
 						maxMatches: 1,
 						time: 600000,
@@ -90,6 +90,7 @@ exports.run = async (client, msg) => {
 					});
 					bugreportAnswers.push(response.first().content);
 					await response.first().delete();
+					await questionMessage.delete();
 				} catch (error) {
 					return msg.channel.send('Bugreport was canceled because you didn\'t answer after 10 minutes');
 				}
@@ -99,7 +100,7 @@ exports.run = async (client, msg) => {
 			const bugreportembed = new Discord.RichEmbed()
 				.setColor('BLUE')
 				.setTitle(`📢 Bug reported by ${msg.author.username} (${msg.author.id})`)
-				.setDescription(`This bugreport needs to be approved/declined. **ReportID: ${botconfs.settings.issuescount}** \n\n`);
+				.setDescription(`This bugreport needs to be approved/declined. \n**🆔: ${botconfs.settings.issuescount}**`);
 
 			for (let index = 0; index < bugreportQuestions.questions.length; index++) {
 				bugreportembed.addField(bugreportQuestions.questions[index].question, bugreportAnswers[index]);
@@ -124,7 +125,7 @@ exports.run = async (client, msg) => {
 						.setFooter(`Min. characters: ${suggestionQuestions.questions[i].minChars}, Max. characters: ${suggestionQuestions.questions[i].maxChars}`)
 						.setColor('BLUE');
 
-					await msg.reply({ embed: questionEmbed });
+					const questionMessage = await msg.reply({ embed: questionEmbed });
 					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= suggestionQuestions.questions[i].maxChars && msg2.content.length >= suggestionQuestions.questions[i].minChars, {
 						maxMatches: 1,
 						time: 600000,
@@ -132,6 +133,7 @@ exports.run = async (client, msg) => {
 					});
 					suggestionAnswers.push(response.first().content);
 					await response.first().delete();
+					await questionMessage.delete();
 				} catch (error) {
 					return msg.channel.send('Suggestion was canceled because you didn\'t answer after 10 minutes');
 				}
@@ -141,7 +143,7 @@ exports.run = async (client, msg) => {
 			const suggestionembed = new Discord.RichEmbed()
 				.setColor('BLUE')
 				.setTitle(`📢 Suggestion reported by ${msg.author.username} (${msg.author.id})`)
-				.setDescription(`This suggestion needs to be approved/declined. **ReportID: ${botconfs.settings.issuescount}** \n\n`);
+				.setDescription(`This suggestion needs to be approved/declined. \n**🆔: ${botconfs.settings.issuescount}**`);
 
 			for (let index = 0; index < suggestionQuestions.questions.length; index++) {
 				suggestionembed.addField(suggestionQuestions.questions[index].question, suggestionAnswers[index]);
