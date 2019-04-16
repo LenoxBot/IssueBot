@@ -10,14 +10,17 @@ exports.run = async (client, msg) => {
 	const bugreportQuestions = {
 		questions: [{
 			question: 'What is the title of your bugreport?',
+			minChars: 15,
 			maxChars: 50
 		},
 		{
 			question: 'How can you reproduce the bug?',
+			minChars: 30,
 			maxChars: 300
 		},
 		{
 			question: 'Which result would normally have to be?',
+			minChars: 30,
 			maxChars: 300
 		}]
 	};
@@ -26,22 +29,28 @@ exports.run = async (client, msg) => {
 	const suggestionQuestions = {
 		questions: [{
 			question: 'What is the title of your proposal?',
+			minChars: 15,
 			maxChars: 50
 		},
 		{
 			question: 'Explain your proposal more accurately (It\'s best to give as much information as possible, so that we can implement the proposal better)',
+			minChars: 30,
 			maxChars: 300
 		},
 		{
 			question: 'Why should we add this feature?',
+			minChars: 30,
 			maxChars: 300
 		}]
 	};
 
 	let typeIssue;
-	await msg.channel.send('A new issue form has been created for you!');
 
-	const typeMessage = await msg.reply('What is this issue about? \n🔴 = Suggestion \n🔵 = Bugreport \n\nPlease react to the reaction that best suits this issue!');
+	const typeMessageEmbed = new Discord.RichEmbed()
+		.setDescription('What is this issue about? \n🔴 = Suggestion \n🔵 = Bugreport \n\nPlease react to the reaction that best suits this issue!')
+		.setColor('BLUE');
+
+	const typeMessage = await msg.reply({ embed: typeMessageEmbed });
 	await typeMessage.react('🔴');
 	await typeMessage.react('🔵');
 
@@ -68,8 +77,13 @@ exports.run = async (client, msg) => {
 		if (typeIssue === 'bugreport') {
 			for (let i = 0; i < bugreportQuestions.questions.length; i++) {
 				try {
-					await msg.channel.send(`${msg.author}, ${bugreportQuestions.questions[i].question}`);
-					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= bugreportQuestions.questions[i].maxChars, {
+					const questionEmbed = new Discord.RichEmbed()
+						.setTitle(bugreportQuestions.questions[i].question)
+						.setFooter(`Min. characters: ${bugreportQuestions.questions[i].minChars}, Max. characters: ${bugreportQuestions.questions[i].maxChars}`)
+						.setColor('BLUE');
+
+					await msg.reply({ embed: questionEmbed });
+					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= bugreportQuestions.questions[i].maxChars && msg2.content.length >= bugreportQuestions.questions[i].minChars, {
 						maxMatches: 1,
 						time: 600000,
 						errors: ['time']
@@ -77,7 +91,6 @@ exports.run = async (client, msg) => {
 					bugreportAnswers.push(response.first().content);
 					await response.first().delete();
 				} catch (error) {
-					console.log(error);
 					return msg.channel.send('Bugreport was canceled because you didn\'t answer after 10 minutes');
 				}
 			}
@@ -85,23 +98,34 @@ exports.run = async (client, msg) => {
 			const processingBugreportsChannel = client.channels.get(settings.processingBugreportsChannel);
 			const bugreportembed = new Discord.RichEmbed()
 				.setColor('BLUE')
-				.setTitle(`Bug reported by ${msg.author.username} (${msg.author.id})`)
-				.setDescription(`This bugreport needs to be approved/declined.\n\n**ReportID: ${botconfs.settings.issuescount}** \n`);
+				.setTitle(`📢 Bug reported by ${msg.author.username} (${msg.author.id})`)
+				.setDescription(`This bugreport needs to be approved/declined. **ReportID: ${botconfs.settings.issuescount}** \n\n`);
 
-			for (let i = 0; i < bugreportQuestions.length; i++) {
-				await bugreportembed.addField(bugreportQuestions[i], bugreportAnswers[i]);
+			for (let index = 0; index < bugreportQuestions.questions.length; index++) {
+				bugreportembed.addField(bugreportQuestions.questions[index].question, bugreportAnswers[index]);
 			}
+
 
 			messageSentToIssueJudges = await processingBugreportsChannel.send({
 				embed: bugreportembed
 			});
 
-			msg.channel.send('Bugreport successfully sent! It will now be checked by the Issue Judgers!');
+			const issueSent = new Discord.RichEmbed()
+				.setColor('GREEN')
+				.setTimestamp()
+				.setTitle(`🆕 Bugreport successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
+
+			msg.reply({ embed: issueSent });
 		} else {
 			for (let i = 0; i < suggestionQuestions.questions.length; i++) {
 				try {
-					await msg.channel.send(`${msg.author}, ${suggestionQuestions.questions[i].question}`);
-					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= suggestionQuestions.questions[i].maxChars, {
+					const questionEmbed = new Discord.RichEmbed()
+						.setTitle(suggestionQuestions.questions[i].question)
+						.setFooter(`Min. characters: ${suggestionQuestions.questions[i].minChars}, Max. characters: ${suggestionQuestions.questions[i].maxChars}`)
+						.setColor('BLUE');
+
+					await msg.reply({ embed: questionEmbed });
+					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= suggestionQuestions.questions[i].maxChars && msg2.content.length >= suggestionQuestions.questions[i].minChars, {
 						maxMatches: 1,
 						time: 600000,
 						errors: ['time']
@@ -116,18 +140,22 @@ exports.run = async (client, msg) => {
 			const processingSuggestionsChannel = client.channels.get(settings.processingSuggestionsChannel);
 			const suggestionembed = new Discord.RichEmbed()
 				.setColor('BLUE')
-				.setTitle(`Suggestion reported by ${msg.author.username} (${msg.author.id})`)
-				.setDescription(`This suggestion needs to be approved/declined.\n\n**ReportID: ${botconfs.settings.issuescount}** \n`);
+				.setTitle(`📢 Suggestion reported by ${msg.author.username} (${msg.author.id})`)
+				.setDescription(`This suggestion needs to be approved/declined. **ReportID: ${botconfs.settings.issuescount}** \n\n`);
 
-			for (let i = 0; i < suggestionQuestions.length; i++) {
-				await suggestionembed.addField(suggestionQuestions[i], suggestionAnswers[i]);
+			for (let index = 0; index < suggestionQuestions.questions.length; index++) {
+				suggestionembed.addField(suggestionQuestions.questions[index].question, suggestionAnswers[index]);
 			}
 
 			messageSentToIssueJudges = await processingSuggestionsChannel.send({
 				embed: suggestionembed
 			});
 
-			msg.channel.send('Suggestion successfully sent! It will now be checked by the Issue Judgers!');
+			const issueSent = new Discord.RichEmbed()
+				.setColor('GREEN')
+				.setTitle(`🆕 Suggestion successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
+
+			msg.reply({ embed: issueSent });
 		}
 
 		const issueSettings = {
