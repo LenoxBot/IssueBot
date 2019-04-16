@@ -2,15 +2,51 @@ exports.run = async (client, msg) => {
 	if (msg.author.bot) return;
 	if (!client.isMongodbReady) return;
 
-	if (!client) {
-		userdb = {};
-		userdb.points = 0;
-		await client.userdb.set(msg.author.id, userdb);
+	const findUser = await client.userSettings.findOne({ userId: msg.author.id });
+	if (!findUser) {
+		await client.userSettings.insertOne({
+			userId: msg.author.id, settings: {
+				totalIssues: {
+					bugreports: {
+						total: 0,
+						accepted: 0,
+						declined: 0
+					},
+					suggestions: {
+						total: 0,
+						accepted: 0,
+						declined: 0
+					}
+				},
+				totalPoints: {
+					bugreports: 0,
+					suggestions: 0
+				}
+			}
+		});
 	}
 
-	if (!tableload.reportid) {
-		tableload.reportid = 0;
-		await client.bugreports.set('bugreports', tableload);
+	const findBotconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	if (!findBotconfs) {
+		await client.botSettings.insertOne({
+			botconfs: 'botconfs', settings: {
+				ignoredUsers: {},
+				totalIssues: {
+					bugreports: {
+						total: 0,
+						accepted: 0,
+						declined: 0
+					},
+					suggestions: {
+						total: 0,
+						accepted: 0,
+						declined: 0
+					}
+				},
+				issues: {},
+				issuescount: 0
+			}
+		});
 	}
 
 	const prefix = '?';
@@ -27,11 +63,6 @@ exports.run = async (client, msg) => {
 
 		if (cmd) {
 			cmd.run(client, msg, args);
-		}
-	}
-	if (msg.channel.id === '497392386847014934') {
-		if (!msg.content.startsWith(`${prefix}approve`) && !msg.content.startsWith(`${prefix}deny`) && !msg.content.startsWith(`${prefix}addattachment`) && !msg.content.startsWith(`${prefix}addnote`)) {
-			msg.delete();
 		}
 	}
 };
