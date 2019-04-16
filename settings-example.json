@@ -14,5 +14,6 @@
     "deniedBugreportsChannel": "",
     "deniedSuggestionsChannel": "",
     "approvedBugreportsChannel": "",
-    "approvedSuggestionsChannel": ""
+    "approvedSuggestionsChannel": "",
+    "lenoxbotDiscordServer": ""
 }
