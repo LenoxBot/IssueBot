@@ -15,5 +15,9 @@
     "deniedSuggestionsChannel": "",
     "approvedBugreportsChannel": "",
     "approvedSuggestionsChannel": "",
-    "lenoxbotDiscordServer": ""
+    "lenoxbotDiscordServer": "",
+    "github": {
+        "username": "username",
+        "password": "password"
+    }
 }
