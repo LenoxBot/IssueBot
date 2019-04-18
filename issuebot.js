@@ -3,6 +3,7 @@ const client = new Discord.Client();
 const settings = require('./settings.json');
 const mongodb = require('mongodb');
 const fs = require('fs');
+const GitHub = require('github-api');
 
 client.isMongodbReady = false;
 
@@ -50,6 +51,11 @@ fs.readdir(`./commands/`, (err, files) => {
 			client.aliases.set(alias, props.help.name);
 		});
 	});
+});
+
+client.GitHub = new GitHub({
+	username: settings.github.username,
+	password: settings.github.password
 });
 
 client.login(settings.token);
