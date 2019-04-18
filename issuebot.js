@@ -58,4 +58,40 @@ client.GitHub = new GitHub({
 	password: settings.github.password
 });
 
+client.bugreportQuestions = {
+	questions: [{
+		question: 'What is the title of your bugreport?',
+		minChars: 15,
+		maxChars: 50
+	},
+	{
+		question: 'How can you reproduce the bug?',
+		minChars: 30,
+		maxChars: 300
+	},
+	{
+		question: 'Which result would normally have to be?',
+		minChars: 30,
+		maxChars: 300
+	}]
+};
+
+client.suggestionQuestions = {
+	questions: [{
+		question: 'What is the title of your proposal?',
+		minChars: 15,
+		maxChars: 50
+	},
+	{
+		question: 'Explain your proposal more accurately (It\'s best to give as much information as possible, so that we can implement the proposal better)',
+		minChars: 30,
+		maxChars: 300
+	},
+	{
+		question: 'Why should we add this feature?',
+		minChars: 30,
+		maxChars: 300
+	}]
+};
+
 client.login(settings.token);
