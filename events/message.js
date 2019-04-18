@@ -21,7 +21,9 @@ exports.run = async (client, msg) => {
 				totalPoints: {
 					bugreports: 0,
 					suggestions: 0
-				}
+				},
+				acceptedRules: false,
+				noIssueJudger: false
 			}
 		});
 	}
