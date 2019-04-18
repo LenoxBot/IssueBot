@@ -149,6 +149,8 @@ exports.run = async (client, msg, args) => {
 
 				botconfs.settings.totalIssues.bugreports.accepted += 1;
 				userconfs.settings.totalIssues.bugreports.accepted += 1;
+
+				userconfs.settings.totalPoints.bugreports += 5;
 			}
 
 			msg.delete();
@@ -288,6 +290,8 @@ exports.run = async (client, msg, args) => {
 
 				botconfs.settings.totalIssues.suggestions.accepted += 1;
 				userconfs.settings.totalIssues.suggestions.accepted += 1;
+
+				userconfs.settings.totalPoints.suggestions += 5;
 			}
 
 			msg.delete();
