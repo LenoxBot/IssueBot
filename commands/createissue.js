@@ -178,7 +178,11 @@ exports.run = async (client, msg) => {
 			important: 0,
 			mediumimportant: 0,
 			unimportant: 0,
-			type: typeIssue
+			type: typeIssue,
+			github: {
+				url: String,
+				id: Number
+			}
 		};
 
 		botconfs.settings.issues[botconfs.settings.issuescount] = issueSettings;
