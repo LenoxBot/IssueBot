@@ -63,7 +63,7 @@ exports.run = async (client, msg, args) => {
 
 			issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
 
-			if (Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length === 1) {
+			if ((Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length + Object.keys(issueconfs.attachments).length + Object.keys(issueconfs.notes).length - 1) === 0) {
 				const newField = `✅ **${msg.author.username}:** ${args.slice(1).join(' ')}`;
 				const bugreportEmbed = new Discord.RichEmbed()
 					.setTitle(fetchedmessage.embeds[0].title)
@@ -209,7 +209,7 @@ exports.run = async (client, msg, args) => {
 
 			issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
 
-			if (Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length === 1) {
+			if ((Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length + Object.keys(issueconfs.attachments).length + Object.keys(issueconfs.notes).length - 1) === 0) {
 				const newField = `✅ **${msg.author.username}:** ${args.slice(1).join(' ')}`;
 				const suggestionEmbed = new Discord.RichEmbed()
 					.setTitle(fetchedmessage.embeds[0].title)
