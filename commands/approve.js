@@ -27,7 +27,7 @@ exports.run = async (client, msg, args) => {
 		try {
 			fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(issueconfs.messageid);
 		} catch (error) {
-			return msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
+			return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
 		}
 
 		if (args.slice(1).join(' ').length > 100) return msg.delete() && msg.reply('Your approve text has to have a maximum of 100 characters!').then(m => m.delete(10000));
@@ -59,7 +59,7 @@ exports.run = async (client, msg, args) => {
 
 		collector.on('end', async (collected, reason) => {
 			message.delete();
-			if (reason === 'time') return msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
+			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 			issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
 
@@ -173,7 +173,7 @@ exports.run = async (client, msg, args) => {
 		try {
 			fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(issueconfs.messageid);
 		} catch (error) {
-			return msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
+			return msg.delete() && msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
 		}
 
 		if (args.slice(1).join(' ').length > 100) return msg.delete() && msg.reply('Your approve text has to have a maxium of 100 characters!').then(m => m.delete(10000));
@@ -205,7 +205,7 @@ exports.run = async (client, msg, args) => {
 
 		collector.on('end', async (collected, reason) => {
 			message.delete();
-			if (reason === 'time') return msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
+			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 			issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
 

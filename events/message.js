@@ -55,10 +55,10 @@ exports.run = async (client, msg) => {
 
 	const prefix = '?';
 
-	if (msg.channel.id === settings.processingBugreportsChannel && !msg.content.startsWith(`${prefix}approve`) && !msg.content.startsWith(`${prefix}decline`) && !msg.content.startsWith(`${prefix}addattachment`) && !msg.content.startsWith(`${prefix}addnote`)) {
+	if (msg.channel.id === settings.processingBugreportsChannel && !msg.content.startsWith(`${prefix}approve`) && !msg.content.startsWith(`${prefix}decline`) && !msg.content.startsWith(`${prefix}addattachment`) && !msg.content.startsWith(`${prefix}addnote`) && !msg.content.startsWith(`${prefix}masterapprove`) && !msg.content.startsWith(`${prefix}masterdecline`)) {
 		msg.delete();
 	}
-	if (msg.channel.id === settings.processingSuggestionsChannel && !msg.content.startsWith(`${prefix}approve`) && !msg.content.startsWith(`${prefix}decline`) && !msg.content.startsWith(`${prefix}addattachment`) && !msg.content.startsWith(`${prefix}addnote`)) {
+	if (msg.channel.id === settings.processingSuggestionsChannel && !msg.content.startsWith(`${prefix}approve`) && !msg.content.startsWith(`${prefix}decline`) && !msg.content.startsWith(`${prefix}addattachment`) && !msg.content.startsWith(`${prefix}addnote`) && !msg.content.startsWith(`${prefix}masterapprove`) && !msg.content.startsWith(`${prefix}masterdecline`)) {
 		msg.delete();
 	}
 

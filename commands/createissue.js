@@ -36,7 +36,7 @@ exports.run = async (client, msg) => {
 
 	collector.on('end', async (collected, reason) => {
 		typeMessage.delete();
-		if (reason === 'time') return msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
+		if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 		botconfs.settings.issuescount += 1;
 

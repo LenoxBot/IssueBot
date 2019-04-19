@@ -48,7 +48,7 @@ exports.run = async (client, msg, args) => {
 
 		collector.on('end', async (collected, reason) => {
 			questionsMessage.delete();
-			if (reason === 'time') return msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
+			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 			const reactedNumberIndex = arrayOfEmojiNumbers.indexOf(reactedEmoji);
 
@@ -76,7 +76,7 @@ exports.run = async (client, msg, args) => {
 			try {
 				fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(issueconfs.messageid);
 			} catch (error) {
-				return msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
+				return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
 			}
 
 			const bugreportEmbed = new Discord.RichEmbed()
@@ -131,7 +131,7 @@ exports.run = async (client, msg, args) => {
 
 		collector.on('end', async (collected, reason) => {
 			questionsMessage.delete();
-			if (reason === 'time') return msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
+			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 			const reactedNumberIndex = arrayOfEmojiNumbers.indexOf(reactedEmoji);
 
@@ -159,7 +159,7 @@ exports.run = async (client, msg, args) => {
 			try {
 				fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(issueconfs.messageid);
 			} catch (error) {
-				return msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
+				return msg.delete() && msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
 			}
 
 			const suggestionEmbed = new Discord.RichEmbed()
