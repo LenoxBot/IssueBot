@@ -30,7 +30,7 @@ exports.run = async (client, msg, args) => {
 			return msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
 		}
 
-		if (args.slice(1).join(' ').length > 100) return msg.delete() && msg.reply('Your approve text has to have a maxium of 100 characters!').then(m => m.delete(10000));
+		if (args.slice(1).join(' ').length > 100) return msg.delete() && msg.reply('Your approve text has to have a maximum of 100 characters!').then(m => m.delete(10000));
 
 		const priorityEmbed = new Discord.RichEmbed()
 			.setDescription('Which priority do you think best fits this bugreport? \n🔴 = priority high \n🔵 = priority medium \n⚫ = priority low \n\nPlease react to the reaction that best suits this bugreport!')
