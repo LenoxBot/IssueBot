@@ -1,2 +1,2 @@
 - [ ] Give credits when a bugreport/suggestion has been accepted!
-- [ ] Delete messages in all config channels if it aren't commands
+- [ ] Delete messages in all config channels if they aren't commands
