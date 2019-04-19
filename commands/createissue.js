@@ -8,42 +8,7 @@ exports.run = async (client, msg) => {
 	const userconfs = await client.userSettings.findOne({ userId: msg.author.id });
 
 	const bugreportAnswers = [];
-	const bugreportQuestions = {
-		questions: [{
-			question: 'What is the title of your bugreport?',
-			minChars: 15,
-			maxChars: 50
-		},
-		{
-			question: 'How can you reproduce the bug?',
-			minChars: 30,
-			maxChars: 300
-		},
-		{
-			question: 'Which result would normally have to be?',
-			minChars: 30,
-			maxChars: 300
-		}]
-	};
-
 	const suggestionAnswers = [];
-	const suggestionQuestions = {
-		questions: [{
-			question: 'What is the title of your proposal?',
-			minChars: 15,
-			maxChars: 50
-		},
-		{
-			question: 'Explain your proposal more accurately (It\'s best to give as much information as possible, so that we can implement the proposal better)',
-			minChars: 30,
-			maxChars: 300
-		},
-		{
-			question: 'Why should we add this feature?',
-			minChars: 30,
-			maxChars: 300
-		}]
-	};
 
 	let typeIssue;
 
@@ -76,15 +41,15 @@ exports.run = async (client, msg) => {
 
 		let messageSentToIssueJudges;
 		if (typeIssue === 'bugreport') {
-			for (let i = 0; i < bugreportQuestions.questions.length; i++) {
+			for (let i = 0; i < client.bugreportQuestions.questions.length; i++) {
 				try {
 					const questionEmbed = new Discord.RichEmbed()
-						.setTitle(bugreportQuestions.questions[i].question)
-						.setFooter(`Min. characters: ${bugreportQuestions.questions[i].minChars}, Max. characters: ${bugreportQuestions.questions[i].maxChars}`)
+						.setTitle(client.bugreportQuestions.questions[i].question)
+						.setFooter(`Min. characters: ${client.bugreportQuestions.questions[i].minChars}, Max. characters: ${client.bugreportQuestions.questions[i].maxChars}`)
 						.setColor('BLUE');
 
 					const questionMessage = await msg.reply({ embed: questionEmbed });
-					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= bugreportQuestions.questions[i].maxChars && msg2.content.length >= bugreportQuestions.questions[i].minChars, {
+					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= client.bugreportQuestions.questions[i].maxChars && msg2.content.length >= client.bugreportQuestions.questions[i].minChars, {
 						maxMatches: 1,
 						time: 600000,
 						errors: ['time']
@@ -103,8 +68,8 @@ exports.run = async (client, msg) => {
 				.setTitle(`📢 Bug reported by ${msg.author.username} (${msg.author.id})`)
 				.setDescription(`This bugreport needs to be approved/declined. \n**🆔: ${botconfs.settings.issuescount}**`);
 
-			for (let index = 0; index < bugreportQuestions.questions.length; index++) {
-				bugreportembed.addField(bugreportQuestions.questions[index].question, bugreportAnswers[index]);
+			for (let index = 0; index < client.bugreportQuestions.questions.length; index++) {
+				bugreportembed.addField(client.bugreportQuestions.questions[index].question, bugreportAnswers[index]);
 			}
 
 
@@ -122,15 +87,15 @@ exports.run = async (client, msg) => {
 			botconfs.settings.totalIssues.bugreports.total += 1;
 			userconfs.settings.totalIssues.bugreports.total += 1;
 		} else {
-			for (let i = 0; i < suggestionQuestions.questions.length; i++) {
+			for (let i = 0; i < client.suggestionQuestions.questions.length; i++) {
 				try {
 					const questionEmbed = new Discord.RichEmbed()
-						.setTitle(suggestionQuestions.questions[i].question)
-						.setFooter(`Min. characters: ${suggestionQuestions.questions[i].minChars}, Max. characters: ${suggestionQuestions.questions[i].maxChars}`)
+						.setTitle(client.suggestionQuestions.questions[i].question)
+						.setFooter(`Min. characters: ${client.suggestionQuestions.questions[i].minChars}, Max. characters: ${client.suggestionQuestions.questions[i].maxChars}`)
 						.setColor('BLUE');
 
 					const questionMessage = await msg.reply({ embed: questionEmbed });
-					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= suggestionQuestions.questions[i].maxChars && msg2.content.length >= suggestionQuestions.questions[i].minChars, {
+					const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= client.suggestionQuestions.questions[i].maxChars && msg2.content.length >= client.suggestionQuestions.questions[i].minChars, {
 						maxMatches: 1,
 						time: 600000,
 						errors: ['time']
@@ -149,8 +114,8 @@ exports.run = async (client, msg) => {
 				.setTitle(`📢 Suggestion proposed by ${msg.author.username} (${msg.author.id})`)
 				.setDescription(`This suggestion needs to be approved/declined. \n**🆔: ${botconfs.settings.issuescount}**`);
 
-			for (let index = 0; index < suggestionQuestions.questions.length; index++) {
-				suggestionembed.addField(suggestionQuestions.questions[index].question, suggestionAnswers[index]);
+			for (let index = 0; index < client.suggestionQuestions.questions.length; index++) {
+				suggestionembed.addField(client.suggestionQuestions.questions[index].question, suggestionAnswers[index]);
 			}
 
 			messageSentToIssueJudges = await processingSuggestionsChannel.send({
