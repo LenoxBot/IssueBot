@@ -6,7 +6,6 @@ exports.run = async (client, msg, args) => {
 
 	const input = args.slice(0, 1);
 	const botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
-	const userconfs = await client.userSettings.findOne({ userId: msg.author.id });
 
 	if (!input || input.length === 0) return msg.delete() && msg.reply('You forgot to specify the Report ID!').then(m => m.delete(10000));
 	if (isNaN(input)) return msg.delete() && msg.reply('You have to enter a Report ID!').then(m => m.delete(10000));
@@ -15,6 +14,7 @@ exports.run = async (client, msg, args) => {
 	if (!botconfs.settings.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
 
 	const issueconfs = botconfs.settings.issues[args.slice(0, 1).join(' ')];
+	const userconfs = await client.userSettings.findOne({ userId: issueconfs.authorid });
 
 	// Bugreports channel:
 	if (msg.channel.id === settings.processingBugreportsChannel) {
@@ -161,7 +161,7 @@ exports.run = async (client, msg, args) => {
 			msg.delete();
 
 			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
-			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { settings: userconfs.settings } });
+			await client.userSettings.updateOne({ userId: issueconfs.authorid }, { $set: { settings: userconfs.settings } });
 		});
 	} else {
 		if (msg.author.id === issueconfs.authorid) return msg.delete() && msg.reply('You can\'t approve your own suggestion!').then(m => m.delete(10000));
@@ -307,7 +307,7 @@ exports.run = async (client, msg, args) => {
 			msg.delete();
 
 			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
-			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { settings: userconfs.settings } });
+			await client.userSettings.updateOne({ userId: issueconfs.authorid }, { $set: { settings: userconfs.settings } });
 		});
 	}
 };
