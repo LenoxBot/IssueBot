@@ -152,7 +152,7 @@ exports.run = async (client, msg, args) => {
 
 		const newEmbed = new Discord.RichEmbed()
 			.setTitle(`❗❌ Suggestion reported by ${msg.author.username} (${msg.author.id})`)
-			.setColor('GREEN')
+			.setColor('RED')
 			.setDescription(newContent);
 
 		for (let i = 0; i < fetchedmessage.embeds[0].fields.length; i++) {
