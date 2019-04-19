@@ -1,3 +1,5 @@
+const settings = require('./../settings.json');
+
 exports.run = async (client, msg) => {
 	if (msg.author.bot) return;
 	if (!client.isMongodbReady) return;
@@ -52,6 +54,14 @@ exports.run = async (client, msg) => {
 	}
 
 	const prefix = '?';
+
+	if (msg.channel.id === settings.processingBugreportsChannel && !msg.content.startsWith(`${prefix}approve`) && !msg.content.startsWith(`${prefix}decline`) && !msg.content.startsWith(`${prefix}addattachment`) && !msg.content.startsWith(`${prefix}addnote`)) {
+		msg.delete();
+	}
+	if (msg.channel.id === settings.processingSuggestionsChannel && !msg.content.startsWith(`${prefix}approve`) && !msg.content.startsWith(`${prefix}decline`) && !msg.content.startsWith(`${prefix}addattachment`) && !msg.content.startsWith(`${prefix}addnote`)) {
+		msg.delete();
+	}
+
 	if (msg.content.startsWith(prefix)) {
 		const args = msg.content.split(' ').slice(1);
 		const command = msg.content.split(' ')[0].slice(prefix.length).toLowerCase();
