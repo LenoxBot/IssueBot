@@ -18,7 +18,7 @@ exports.run = async (client, msg, args) => {
 
 	// Bugreports channel:
 	if (msg.channel.id === settings.processingBugreportsChannel) {
-		if (msg.author.id === issueconfs.authorid) return msg.delete() && msg.reply('You can\'t approve your own bugreport!').then(m => m.delete(10000));
+		// if (msg.author.id === issueconfs.authorid) return msg.delete() && msg.reply('You can\'t approve your own bugreport!').then(m => m.delete(10000));
 
 		if (issueconfs.approve.hasOwnProperty(msg.author.id)) return msg.delete() && msg.reply('You have already approved this bugreport!').then(m => m.delete(10000));
 		if (issueconfs.deny.hasOwnProperty(msg.author.id)) return msg.delete() && msg.reply('You have already declined this bugreport!').then(m => m.delete(10000));
@@ -106,8 +106,9 @@ exports.run = async (client, msg, args) => {
 
 				const newContent = fetchedmessage.embeds[0].description.replace('This bugreport needs to be approved/declined.', '');
 
+				const newTitle = fetchedmessage.embeds[0].title.replace('📢', '✅');
 				const newEmbed = new Discord.RichEmbed()
-					.setTitle(`✅ Bug reported by ${msg.author.username} (${msg.author.id})`)
+					.setTitle(newTitle)
 					.setColor('GREEN')
 					.setDescription(newContent);
 
@@ -164,7 +165,7 @@ exports.run = async (client, msg, args) => {
 			await client.userSettings.updateOne({ userId: issueconfs.authorid }, { $set: { settings: userconfs.settings } });
 		});
 	} else {
-		if (msg.author.id === issueconfs.authorid) return msg.delete() && msg.reply('You can\'t approve your own suggestion!').then(m => m.delete(10000));
+		// if (msg.author.id === issueconfs.authorid) return msg.delete() && msg.reply('You can\'t approve your own suggestion!').then(m => m.delete(10000));
 
 		if (issueconfs.approve.hasOwnProperty(msg.author.id)) return msg.delete() && msg.reply('You have already approved this suggestion!').then(m => m.delete(10000));
 		if (issueconfs.deny.hasOwnProperty(msg.author.id)) return msg.delete() && msg.reply('You have already declined this suggestion!').then(m => m.delete(10000));
@@ -252,8 +253,9 @@ exports.run = async (client, msg, args) => {
 
 				const newContent = fetchedmessage.embeds[0].description.replace('This suggestion needs to be approved/declined.', '');
 
+				const newTitle = fetchedmessage.embeds[0].title.replace('📢', '✅');
 				const newEmbed = new Discord.RichEmbed()
-					.setTitle(`✅ Suggestion reported by ${msg.author.username} (${msg.author.id})`)
+					.setTitle(newTitle)
 					.setColor('GREEN')
 					.setDescription(newContent);
 

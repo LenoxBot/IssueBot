@@ -7,49 +7,47 @@ exports.run = async (client, msg) => {
 	const findUser = await client.userSettings.findOne({ userId: msg.author.id });
 	if (!findUser) {
 		await client.userSettings.insertOne({
-			userId: msg.author.id, settings: {
-				totalIssues: {
-					bugreports: {
-						total: 0,
-						accepted: 0,
-						declined: 0
-					},
-					suggestions: {
-						total: 0,
-						accepted: 0,
-						declined: 0
-					}
+			userId: msg.author.id,
+			totalIssues: {
+				bugreports: {
+					total: 0,
+					accepted: 0,
+					declined: 0
 				},
-				totalPoints: {
-					bugreports: 0,
-					suggestions: 0
-				},
-				acceptedRules: false,
-				noIssueJudger: false
-			}
+				suggestions: {
+					total: 0,
+					accepted: 0,
+					declined: 0
+				}
+			},
+			totalPoints: {
+				bugreports: 0,
+				suggestions: 0
+			},
+			acceptedRules: false,
+			noIssueJudger: false
 		});
 	}
 
 	const findBotconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
 	if (!findBotconfs) {
 		await client.botSettings.insertOne({
-			botconfs: 'botconfs', settings: {
-				ignoredUsers: {},
-				totalIssues: {
-					bugreports: {
-						total: 0,
-						accepted: 0,
-						declined: 0
-					},
-					suggestions: {
-						total: 0,
-						accepted: 0,
-						declined: 0
-					}
+			botconfs: 'botconfs',
+			ignoredUsers: {},
+			totalIssues: {
+				bugreports: {
+					total: 0,
+					accepted: 0,
+					declined: 0
 				},
-				issues: {},
-				issuescount: 0
-			}
+				suggestions: {
+					total: 0,
+					accepted: 0,
+					declined: 0
+				}
+			},
+			issues: {},
+			issuescount: 0
 		});
 	}
 

@@ -78,12 +78,12 @@ client.bugreportQuestions = {
 
 client.suggestionQuestions = {
 	questions: [{
-		question: 'What is the title of your proposal?',
+		question: 'What is the title of your suggestion?',
 		minChars: 15,
 		maxChars: 50
 	},
 	{
-		question: 'Explain your proposal more accurately (It\'s best to give as much information as possible, so that we can implement the proposal better)',
+		question: 'Explain your suggestion more accurately (It\'s best to give as much information as possible, so that we can implement the suggestion better)',
 		minChars: 30,
 		maxChars: 300
 	},

@@ -72,8 +72,9 @@ exports.run = async (client, msg, args) => {
 
 		const newContent = fetchedmessage.embeds[0].description.replace('This bugreport needs to be approved/declined.', '');
 
+		const newTitle = fetchedmessage.embeds[0].title.replace('📢', '❗❌');
 		const newEmbed = new Discord.RichEmbed()
-			.setTitle(`❗❌ Bug reported by ${msg.author.username} (${msg.author.id})`)
+			.setTitle(newTitle)
 			.setColor('RED')
 			.setDescription(newContent);
 
@@ -150,8 +151,9 @@ exports.run = async (client, msg, args) => {
 
 		const newContent = fetchedmessage.embeds[0].description.replace('This suggestion needs to be approved/declined.', '');
 
+		const newTitle = fetchedmessage.embeds[0].title.replace('📢', '❗❌');
 		const newEmbed = new Discord.RichEmbed()
-			.setTitle(`❗❌ Suggestion reported by ${msg.author.username} (${msg.author.id})`)
+			.setTitle(newTitle)
 			.setColor('RED')
 			.setDescription(newContent);
 

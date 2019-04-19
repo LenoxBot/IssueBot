@@ -4,7 +4,8 @@ const settings = require('./../settings.json');
 exports.run = async (client, msg) => {
 	if (msg.guild.id !== settings.lenoxbotDiscordServer) return msg.channel.send('The bugreport must be written to the LenoxBot Discord server!');
 
-	const botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	let botconfs;
+	let userconfs;
 	const userconfs = await client.userSettings.findOne({ userId: msg.author.id });
 
 	const bugreportAnswers = [];
@@ -38,7 +39,9 @@ exports.run = async (client, msg) => {
 		typeMessage.delete();
 		if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
-		botconfs.settings.issuescount += 1;
+		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+		botconfs.issuescount += 1;
+		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issuescount: botconfs.issuescount } });
 
 		let messageSentToIssueJudges;
 		if (typeIssue === 'bugreport') {
@@ -81,11 +84,14 @@ exports.run = async (client, msg) => {
 			const issueSent = new Discord.RichEmbed()
 				.setColor('GREEN')
 				.setTimestamp()
-				.setTitle(`🆕 Bugreport successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
+				.setTitle(`✅ Bugreport successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
 
 			msg.reply({ embed: issueSent });
 
-			botconfs.settings.totalIssues.bugreports.total += 1;
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.totalIssues.bugreports.total += 1;
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
+
 			userconfs.settings.totalIssues.bugreports.total += 1;
 		} else {
 			for (let i = 0; i < client.suggestionQuestions.questions.length; i++) {
@@ -119,7 +125,7 @@ exports.run = async (client, msg) => {
 				suggestionembed.addField(client.suggestionQuestions.questions[index].question, suggestionAnswers[index]);
 			}
 
-			messageSentToIssueJudges = await processingSuggestionsChannel.send({
+			messageSentToIssueJudges = processingSuggestionsChannel.send({
 				embed: suggestionembed
 			});
 
@@ -129,12 +135,16 @@ exports.run = async (client, msg) => {
 
 			msg.reply({ embed: issueSent });
 
-			botconfs.settings.totalIssues.suggestions.total += 1;
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.totalIssues.suggestions.total += 1;
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
+
 			userconfs.settings.totalIssues.suggestions.total += 1;
 		}
 
+		botconfs = client.botSettings.findOne({ botconfs: 'botconfs' });
 		const issueSettings = {
-			reportid: botconfs.settings.issuescount,
+			reportid: botconfs.issuescount,
 			messageid: messageSentToIssueJudges.id,
 			authorid: msg.author.id,
 			attachments: {},
@@ -151,10 +161,9 @@ exports.run = async (client, msg) => {
 			}
 		};
 
-		botconfs.settings.issues[botconfs.settings.issuescount] = issueSettings;
-
-		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
-		await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { settings: userconfs.settings } });
+		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+		botconfs.issues[botconfs.settings.issuescount] = issueSettings
+		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 	});
 };
 

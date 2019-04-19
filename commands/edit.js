@@ -50,12 +50,27 @@ exports.run = async (client, msg, args) => {
 			questionsMessage.delete();
 			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
+			let fetchedmessage;
+			try {
+				fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(issueconfs.messageid);
+			} catch (error) {
+				return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
+			}
+
 			const reactedNumberIndex = arrayOfEmojiNumbers.indexOf(reactedEmoji);
+
+			let currentAnswer;
+			for (let i = 0; i < fetchedmessage.embeds[0].fields.length; i++) {
+				if (fetchedmessage.embeds[0].fields[i].name === client.suggestionQuestions.questions[reactedNumberIndex].question) {
+					currentAnswer = fetchedmessage.embeds[0].fields[i].value;
+				}
+			}
 
 			const questionEmbed = new Discord.RichEmbed()
 				.setColor('BLUE')
 				.setTitle('Please answer again to this question to edit your issue')
 				.setDescription(client.bugreportQuestions.questions[reactedNumberIndex].question)
+				.addField('Your current answer is:', currentAnswer)
 				.setFooter(`Min. characters: ${client.suggestionQuestions.questions[reactedNumberIndex].minChars}, Max. characters: ${client.suggestionQuestions.questions[reactedNumberIndex].maxChars}`);
 
 			try {
@@ -70,13 +85,6 @@ exports.run = async (client, msg, args) => {
 				await questionMessage.delete();
 			} catch (error) {
 				return msg.channel.send('Edit was canceled because you didn\'t answer after 10 minutes');
-			}
-
-			let fetchedmessage;
-			try {
-				fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(issueconfs.messageid);
-			} catch (error) {
-				return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
 			}
 
 			const bugreportEmbed = new Discord.RichEmbed()
@@ -133,12 +141,27 @@ exports.run = async (client, msg, args) => {
 			questionsMessage.delete();
 			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
+			let fetchedmessage;
+			try {
+				fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(issueconfs.messageid);
+			} catch (error) {
+				return msg.delete() && msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
+			}
+
 			const reactedNumberIndex = arrayOfEmojiNumbers.indexOf(reactedEmoji);
+
+			let currentAnswer;
+			for (let i = 0; i < fetchedmessage.embeds[0].fields.length; i++) {
+				if (fetchedmessage.embeds[0].fields[i].name === client.suggestionQuestions.questions[reactedNumberIndex].question) {
+					currentAnswer = fetchedmessage.embeds[0].fields[i].value;
+				}
+			}
 
 			const questionEmbed = new Discord.RichEmbed()
 				.setColor('BLUE')
 				.setTitle('Please answer again to this question to edit your issue')
 				.setDescription(client.suggestionQuestions.questions[reactedNumberIndex].question)
+				.addField('Your current answer is:', currentAnswer)
 				.setFooter(`Min. characters: ${client.suggestionQuestions.questions[reactedNumberIndex].minChars}, Max. characters: ${client.suggestionQuestions.questions[reactedNumberIndex].maxChars}`);
 
 			try {
@@ -153,13 +176,6 @@ exports.run = async (client, msg, args) => {
 				await questionMessage.delete();
 			} catch (error) {
 				return msg.channel.send('Edit was canceled because you didn\'t answer after 10 minutes');
-			}
-
-			let fetchedmessage;
-			try {
-				fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(issueconfs.messageid);
-			} catch (error) {
-				return msg.delete() && msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
 			}
 
 			const suggestionEmbed = new Discord.RichEmbed()
