@@ -112,6 +112,7 @@ exports.run = async (client, msg, args) => {
 				embed: suggestionEmbed
 			});
 		}
+		msg.delete();
 		msg.reply('The attachment was added successfully to the issue!').then(m => m.delete(10000));
 	}
 };
