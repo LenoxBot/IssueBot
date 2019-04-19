@@ -151,6 +151,11 @@ exports.run = async (client, msg, args) => {
 				userconfs.settings.totalIssues.bugreports.accepted += 1;
 
 				userconfs.settings.totalPoints.bugreports += 5;
+
+				if (!msg.guild.members.get(issueconfs.authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.settings.totalPoints.suggestions + userconfs.settings.totalPoints.bugreports) >= 50)) {
+					await msg.guild.members.get(issueconfs.authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
+					msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(issueconfs.authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
+				}
 			}
 
 			msg.delete();
@@ -292,6 +297,11 @@ exports.run = async (client, msg, args) => {
 				userconfs.settings.totalIssues.suggestions.accepted += 1;
 
 				userconfs.settings.totalPoints.suggestions += 5;
+
+				if (!msg.guild.members.get(issueconfs.authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.settings.totalPoints.suggestions + userconfs.settings.totalPoints.bugreports) >= 50)) {
+					await msg.guild.members.get(issueconfs.authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
+					msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(issueconfs.authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
+				}
 			}
 
 			msg.delete();
