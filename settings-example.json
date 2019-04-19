@@ -20,5 +20,11 @@
     "github": {
         "username": "username",
         "password": "password"
+    },
+    "lenoxbotdb": {
+        "user": "username",
+		"password": "password",
+		"host": "localhost",
+		"port": "27017"
     }
 }

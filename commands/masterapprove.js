@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const settings = require('./../settings.json');
 
 exports.run = async (client, msg, args) => {
-	if (!settings.administrators.includes(msg.author.id) && !settings.owners.includes(msg.author.id)) return;
+	if (!settings.moderators.includes(msg.author.id) && !settings.owners.includes(msg.author.id)) return;
 	if (msg.channel.id !== settings.processingBugreportsChannel && msg.channel.id !== settings.processingSuggestionsChannel) return;
 
 	const input = args.slice(0, 1);
