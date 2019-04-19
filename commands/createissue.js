@@ -10,8 +10,9 @@ exports.run = async (client, msg) => {
 	const bugreportAnswers = [];
 	const suggestionAnswers = [];
 
-	let typeIssue;
+	msg.delete();
 
+	let typeIssue;
 	const typeMessageEmbed = new Discord.RichEmbed()
 		.setDescription('What is this issue about? \n🔴 = Suggestion \n🔵 = Bugreport \n\nPlease react to the reaction that best suits this issue!')
 		.setColor('BLUE');
@@ -124,7 +125,7 @@ exports.run = async (client, msg) => {
 
 			const issueSent = new Discord.RichEmbed()
 				.setColor('GREEN')
-				.setTitle(`🆕 Suggestion successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
+				.setTitle(`✅ Suggestion successfully sent! It will now be checked by the Issue Judgers! Thanks!`);
 
 			msg.reply({ embed: issueSent });
 
