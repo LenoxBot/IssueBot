@@ -6,22 +6,22 @@ exports.run = async (client, msg, args) => {
 	if (msg.channel.id !== settings.processingBugreportsChannel && msg.channel.id !== settings.processingSuggestionsChannel) return;
 
 	const input = args.slice(0, 1);
-	const botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	let botconfs;
+	let userconfs;
 
 	if (!input || input.length === 0) return msg.delete() && msg.reply('You forgot to specify the Report ID!').then(m => m.delete(10000));
 	if (isNaN(input)) return msg.delete() && msg.reply('You have to enter a Report ID!').then(m => m.delete(10000));
 	if (args.slice(1).length === 0) return msg.delete() && msg.reply('You forgot to add information to your approve!').then(m => m.delete(10000));
 	if (msg.attachments.size !== 0) return msg.delete() && msg.reply('You are not allowed to add screenshots to an approve!').then(m => m.delete(10000));
-	if (!botconfs.settings.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
 
-	const issueconfs = botconfs.settings.issues[args.slice(0, 1).join(' ')];
-	const userconfs = await client.userSettings.findOne({ userId: issueconfs.authorid });
+	botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	if (!botconfs.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
 
 	// Bugreports channel:
 	if (msg.channel.id === settings.processingBugreportsChannel) {
 		let fetchedmessage;
 		try {
-			fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(issueconfs.messageid);
+			fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 		} catch (error) {
 			return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
 		}
@@ -40,15 +40,24 @@ exports.run = async (client, msg, args) => {
 		const collector = message.createReactionCollector((reaction, user) => user.id === msg.author.id, {
 			time: 30000
 		});
-		collector.on('collect', r => {
+		collector.on('collect', async r => {
 			if (r.emoji.name === '🔴') {
-				issueconfs.important += 1;
+				botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+				botconfs.issues[args.slice(0, 1).join(' ')].important += 1;
+				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
+
 				collector.stop();
 			} else if (r.emoji.name === '🔵') {
-				issueconfs.mediumimportant += 1;
+				botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+				botconfs.issues[args.slice(0, 1).join(' ')].mediumimportant += 1;
+				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
+
 				collector.stop();
 			} else if (r.emoji.name === '⚫') {
-				issueconfs.unimportant += 1;
+				botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+				botconfs.issues[args.slice(0, 1).join(' ')].unimportant += 1;
+				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
+
 				collector.stop();
 			}
 		});
@@ -57,9 +66,11 @@ exports.run = async (client, msg, args) => {
 			message.delete();
 			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
-			issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.issues[args.slice(0, 1).join(' ')].approve[msg.author.id] = args.slice(1).join(' ');
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 
-			if ((Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length + Object.keys(issueconfs.attachments).length + Object.keys(issueconfs.notes).length - 1) === 0) {
+			if ((Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].deny).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].attachments).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].notes).length - 1) === 0) {
 				const newField = `❗✅ **${msg.author.username}:** ${args.slice(1).join(' ')}`;
 				const bugreportEmbed = new Discord.RichEmbed()
 					.setTitle(fetchedmessage.embeds[0].title)
@@ -97,7 +108,7 @@ exports.run = async (client, msg, args) => {
 
 			await msg.reply('The report was masterapproved successfully!').then(m => m.delete(10000));
 
-			msg.guild.members.get(issueconfs.authorid).send(`Thank you for your bugreport! Your bugreport has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${issueconfs.reportid})`);
+			msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your bugreport! Your bugreport has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 			const newContent = fetchedmessage.embeds[0].description.replace('This bugreport needs to be approved/declined.', '');
 
@@ -122,9 +133,9 @@ exports.run = async (client, msg, args) => {
 
 			GitHubIssue.labels = ['t: bugreport'];
 
-			if (issueconfs.important >= 1) {
+			if (botconfs.issues[args.slice(0, 1).join(' ')].important >= 1) {
 				GitHubIssue.labels.push('p: high');
-			} else if (issueconfs.mediumimportant >= 1) {
+			} else if (botconfs.issues[args.slice(0, 1).join(' ')].mediumimportant >= 1) {
 				GitHubIssue.labels.push('p: medium');
 			} else {
 				GitHubIssue.labels.push('p: low');
@@ -140,28 +151,33 @@ exports.run = async (client, msg, args) => {
 			});
 			fetchedmessage.delete();
 
-			issueconfs.github.url = createdIssue.data.html_url;
-			issueconfs.github.id = createdIssue.data.id;
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.issues[args.slice(0, 1).join(' ')].github.url = createdIssue.data.html_url;
+			botconfs.issues[args.slice(0, 1).join(' ')].github.id = createdIssue.data.id;
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 
-			botconfs.settings.totalIssues.bugreports.accepted += 1;
-			userconfs.settings.totalIssues.bugreports.accepted += 1;
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.totalIssues.bugreports.accepted += 1;
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-			userconfs.settings.totalPoints.bugreports += 5;
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+			userconfs.totalIssues.bugreports.accepted += 1;
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
 
-			if (!msg.guild.members.get(issueconfs.authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.settings.totalPoints.suggestions + userconfs.settings.totalPoints.bugreports) >= 50)) {
-				await msg.guild.members.get(issueconfs.authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
-				msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(issueconfs.authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+			userconfs.totalPoints.bugreports += 5;
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
+
+			if (!msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.totalPoints.suggestions + userconfs.totalPoints.bugreports) >= 50)) {
+				await msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
+				msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
 			}
-
 			msg.delete();
-
-			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
-			await client.userSettings.updateOne({ userId: issueconfs.authorid }, { $set: { settings: userconfs.settings } });
 		});
 	} else {
 		let fetchedmessage;
 		try {
-			fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(issueconfs.messageid);
+			fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 		} catch (error) {
 			return msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
 		}
@@ -180,15 +196,24 @@ exports.run = async (client, msg, args) => {
 		const collector = message.createReactionCollector((reaction, user) => user.id === msg.author.id, {
 			time: 30000
 		});
-		collector.on('collect', r => {
+		collector.on('collect', async r => {
 			if (r.emoji.name === '🔴') {
-				issueconfs.important += 1;
+				botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+				botconfs.issues[args.slice(0, 1).join(' ')].important += 1;
+				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
+
 				collector.stop();
 			} else if (r.emoji.name === '🔵') {
-				issueconfs.mediumimportant += 1;
+				botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+				botconfs.issues[args.slice(0, 1).join(' ')].mediumimportant += 1;
+				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
+
 				collector.stop();
 			} else if (r.emoji.name === '⚫') {
-				issueconfs.unimportant += 1;
+				botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+				botconfs.issues[args.slice(0, 1).join(' ')].unimportant += 1;
+				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
+
 				collector.stop();
 			}
 		});
@@ -197,9 +222,11 @@ exports.run = async (client, msg, args) => {
 			message.delete();
 			if (reason === 'time') return msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
-			issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.issues[args.slice(0, 1).join(' ')].approve[msg.author.id] = args.slice(1).join(' ');
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 
-			if ((Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length + Object.keys(issueconfs.attachments).length + Object.keys(issueconfs.notes).length - 1) === 0) {
+			if ((Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].deny).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].attachments).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].notes).length - 1) === 0) {
 				const newField = `❗✅ **${msg.author.username}:** ${args.slice(1).join(' ')}`;
 				const suggestionEmbed = new Discord.RichEmbed()
 					.setTitle(fetchedmessage.embeds[0].title)
@@ -237,7 +264,7 @@ exports.run = async (client, msg, args) => {
 
 			await msg.reply('The report was masterapproved successfully!').then(m => m.delete(10000));
 
-			msg.guild.members.get(issueconfs.authorid).send(`Thank you for your suggestion! Your suggestion has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${issueconfs.reportid})`);
+			msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your suggestion! Your suggestion has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 			const newContent = fetchedmessage.embeds[0].description.replace('This suggestion needs to be approved/declined.', '');
 
@@ -262,9 +289,9 @@ exports.run = async (client, msg, args) => {
 
 			GitHubIssue.labels = ['t: enhancement'];
 
-			if (issueconfs.important >= 1) {
+			if (botconfs.issues[args.slice(0, 1).join(' ')].important >= 1) {
 				GitHubIssue.labels.push('p: high');
-			} else if (issueconfs.mediumimportant >= 1) {
+			} else if (botconfs.issues[args.slice(0, 1).join(' ')].mediumimportant >= 1) {
 				GitHubIssue.labels.push('p: medium');
 			} else {
 				GitHubIssue.labels.push('p: low');
@@ -280,23 +307,28 @@ exports.run = async (client, msg, args) => {
 			});
 			fetchedmessage.delete();
 
-			issueconfs.github.url = createdIssue.data.html_url;
-			issueconfs.github.id = createdIssue.data.id;
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.issues[args.slice(0, 1).join(' ')].github.url = createdIssue.data.html_url;
+			botconfs.issues[args.slice(0, 1).join(' ')].github.id = createdIssue.data.id;
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 
-			botconfs.settings.totalIssues.suggestions.accepted += 1;
-			userconfs.settings.totalIssues.suggestions.accepted += 1;
+			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+			botconfs.totalIssues.suggestions.accepted += 1;
+			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-			userconfs.settings.totalPoints.suggestions += 5;
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+			userconfs.totalIssues.suggestions.accepted += 1;
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
 
-			if (!msg.guild.members.get(issueconfs.authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.settings.totalPoints.suggestions + userconfs.settings.totalPoints.bugreports) >= 50)) {
-				await msg.guild.members.get(issueconfs.authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
-				msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(issueconfs.authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+			userconfs.totalPoints.suggestions += 5;
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
+
+			if (!msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.totalPoints.suggestions + userconfs.totalPoints.bugreports) >= 50)) {
+				await msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
+				msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
 			}
-
 			msg.delete();
-
-			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
-			await client.userSettings.updateOne({ userId: issueconfs.authorid }, { $set: { settings: userconfs.settings } });
 		});
 	}
 };

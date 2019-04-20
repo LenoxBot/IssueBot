@@ -5,20 +5,19 @@ exports.run = async (client, msg, args) => {
 	const arrayOfEmojiNumbers = ['1⃣', '2⃣', '3⃣', '4⃣'];
 
 	const input = args.slice(0, 1);
-	const botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
 
 	if (!input || input.length === 0) return msg.delete() && msg.reply('You forgot to specify the Report ID!').then(m => m.delete(10000));
 	if (isNaN(input)) return msg.delete() && msg.reply('You have to enter a Report ID!').then(m => m.delete(10000));
-	// delete if (args.slice(1).length === 0) return msg.delete() && msg.reply('You forgot to add information to your approve!').then(m => m.delete(10000));
-	if (!botconfs.settings.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
 
-	const issueconfs = botconfs.settings.issues[args.slice(0, 1).join(' ')];
-	if ((Object.keys(issueconfs.approve).length + Object.keys(issueconfs.deny).length) !== 0) return msg.delete() && msg.reply('You can\'t edit a question that has already been approved or denied!').then(m => m.delete(10000));
-	if (msg.author.id !== issueconfs.authorid) return msg.delete() && msg.reply('You can only edit your own issues!').then(m => m.delete(10000));
+	const botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	if (!botconfs.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
+
+	if ((Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].deny).length) !== 0) return msg.delete() && msg.reply('You can\'t edit a question that has already been approved or denied!').then(m => m.delete(10000));
+	if (msg.author.id !== botconfs.issues[args.slice(0, 1).join(' ')].authorid) return msg.delete() && msg.reply('You can only edit your own issues!').then(m => m.delete(10000));
 
 	msg.delete();
 
-	if (issueconfs.type === 'bugreport') {
+	if (botconfs.issues[args.slice(0, 1).join(' ')].type === 'bugreport') {
 		const embedOfQuestions = new Discord.RichEmbed()
 			.setTitle('Which question do you want to edit?')
 			.setColor('BLUE');
@@ -52,7 +51,7 @@ exports.run = async (client, msg, args) => {
 
 			let fetchedmessage;
 			try {
-				fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(issueconfs.messageid);
+				fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 			} catch (error) {
 				return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
 			}
@@ -61,7 +60,7 @@ exports.run = async (client, msg, args) => {
 
 			let currentAnswer;
 			for (let i = 0; i < fetchedmessage.embeds[0].fields.length; i++) {
-				if (fetchedmessage.embeds[0].fields[i].name === client.suggestionQuestions.questions[reactedNumberIndex].question) {
+				if (fetchedmessage.embeds[0].fields[i].name === client.bugreportQuestions.questions[reactedNumberIndex].question) {
 					currentAnswer = fetchedmessage.embeds[0].fields[i].value;
 				}
 			}
@@ -71,11 +70,11 @@ exports.run = async (client, msg, args) => {
 				.setTitle('Please answer again to this question to edit your issue')
 				.setDescription(client.bugreportQuestions.questions[reactedNumberIndex].question)
 				.addField('Your current answer is:', currentAnswer)
-				.setFooter(`Min. characters: ${client.suggestionQuestions.questions[reactedNumberIndex].minChars}, Max. characters: ${client.suggestionQuestions.questions[reactedNumberIndex].maxChars}`);
+				.setFooter(`Min. characters: ${client.bugreportQuestions.questions[reactedNumberIndex].minChars}, Max. characters: ${client.bugreportQuestions.questions[reactedNumberIndex].maxChars}`);
 
 			try {
 				const questionMessage = await msg.reply({ embed: questionEmbed });
-				const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= client.suggestionQuestions.questions[reactedNumberIndex].maxChars && msg2.content.length >= client.suggestionQuestions.questions[reactedNumberIndex].minChars, {
+				const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= client.bugreportQuestions.questions[reactedNumberIndex].maxChars && msg2.content.length >= client.bugreportQuestions.questions[reactedNumberIndex].minChars, {
 					maxMatches: 1,
 					time: 600000,
 					errors: ['time']
@@ -106,7 +105,7 @@ exports.run = async (client, msg, args) => {
 
 			const editedEmbed = new Discord.RichEmbed()
 				.setColor('GREEN')
-				.setTitle(`✅ Edited successfully your issue (🆔: ${issueconfs.reportid})!`);
+				.setTitle(`✅ Edited successfully your issue (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})!`);
 			msg.reply({ embed: editedEmbed });
 		});
 	} else {
@@ -143,7 +142,7 @@ exports.run = async (client, msg, args) => {
 
 			let fetchedmessage;
 			try {
-				fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(issueconfs.messageid);
+				fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 			} catch (error) {
 				return msg.delete() && msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
 			}
@@ -197,7 +196,7 @@ exports.run = async (client, msg, args) => {
 
 			const editedEmbed = new Discord.RichEmbed()
 				.setColor('GREEN')
-				.setTitle(`✅ Edited successfully your issue (🆔: ${issueconfs.reportid})!`);
+				.setTitle(`✅ Edited sccessfully your issue (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})!`);
 			msg.reply({ embed: editedEmbed });
 		});
 	}

@@ -9,9 +9,9 @@ exports.run = async (client, msg) => {
 		.setColor('BLUE')
 		.setTimestamp()
 		.setTitle(`Stats of ${user1.tag}`)
-		.addField(`Total points: ${userconfs.settings.totalPoints.bugreports + userconfs.settings.totalPoints.suggestions}`, `${userconfs.settings.totalPoints.bugreports} for bugreports \n${userconfs.settings.totalPoints.suggestions} for suggestions`)
-		.addField(`Bugreports:`, `📋: ${userconfs.settings.totalIssues.bugreports.total} \n✅: ${userconfs.settings.totalIssues.bugreports.accepted} \n❌: ${userconfs.settings.totalIssues.bugreports.declined}`)
-		.addField(`Suggestions:`, `📋: ${userconfs.settings.totalIssues.suggestions.total} \n✅: ${userconfs.settings.totalIssues.suggestions.accepted} \n❌: ${userconfs.settings.totalIssues.suggestions.declined}`);
+		.addField(`Total points: ${userconfs.totalPoints.bugreports + userconfs.totalPoints.suggestions}`, `${userconfs.totalPoints.bugreports} for bugreports \n${userconfs.totalPoints.suggestions} for suggestions`)
+		.addField(`Bugreports:`, `📋: ${userconfs.totalIssues.bugreports.total} \n✅: ${userconfs.totalIssues.bugreports.accepted} \n❌: ${userconfs.totalIssues.bugreports.declined}`)
+		.addField(`Suggestions:`, `📋: ${userconfs.totalIssues.suggestions.total} \n✅: ${userconfs.totalIssues.suggestions.accepted} \n❌: ${userconfs.totalIssues.suggestions.declined}`);
 
 	msg.channel.send({ embed: embed });
 };

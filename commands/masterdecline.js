@@ -6,31 +6,33 @@ exports.run = async (client, msg, args) => {
 	if (msg.channel.id !== settings.processingBugreportsChannel && msg.channel.id !== settings.processingSuggestionsChannel) return;
 
 	const input = args.slice(0, 1);
-	const botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	let botconfs;
+	let userconfs;
 
 	if (!input || input.length === 0) return msg.delete() && msg.reply('You forgot to specify the Report ID!').then(m => m.delete(10000));
 	if (isNaN(input)) return msg.delete() && msg.reply('You have to enter a Report ID!').then(m => m.delete(10000));
 	if (args.slice(1).length === 0) return msg.delete() && msg.reply('You forgot to add information to your decline!').then(m => m.delete(10000));
 	if (msg.attachments.size !== 0) return msg.delete() && msg.reply('You are not allowed to add screenshots to an decline!').then(m => m.delete(10000));
-	if (!botconfs.settings.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
 
-	const issueconfs = botconfs.settings.issues[args.slice(0, 1).join(' ')];
-	const userconfs = await client.userSettings.findOne({ userId: issueconfs.authorid });
+	botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+	if (!botconfs.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
 
 	// Bugreports channel:
 	if (msg.channel.id === settings.processingBugreportsChannel) {
 		let fetchedmessage;
 		try {
-			fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(issueconfs.messageid);
+			fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 		} catch (error) {
 			return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore!').then(m => m.delete(10000));
 		}
 
 		if (args.slice(1).join(' ').length > 100) return msg.delete() && msg.reply('Your decline text has to have a maximum of 100 characters!').then(m => m.delete(10000));
 
-		issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
+		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+		botconfs.issues[args.slice(0, 1).join(' ')].deny[msg.author.id] = args.slice(1).join(' ');
+		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 
-		if ((Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length + Object.keys(issueconfs.attachments).length + Object.keys(issueconfs.notes).length - 1) === 0) {
+		if ((Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].deny).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].attachments).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].notes).length - 1) === 0) {
 			const newField = `❗❌ **${msg.author.username}:** ${args.slice(1).join(' ')}`;
 			const bugreportEmbed = new Discord.RichEmbed()
 				.setTitle(fetchedmessage.embeds[0].title)
@@ -68,7 +70,7 @@ exports.run = async (client, msg, args) => {
 
 		await msg.reply('The report was masterdeclined successfully!').then(m => m.delete(10000));
 
-		msg.guild.members.get(issueconfs.authorid).send(`Thank you for your bugreport! Your bugreport was unfortunately rejected. The reason is usually in the comments of the Issue Judgers. (🆔: ${issueconfs.reportid})`);
+		msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your bugreport! Your bugreport was unfortunately rejected. The reason is usually in the comments of the Issue Judgers. (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 		const newContent = fetchedmessage.embeds[0].description.replace('This bugreport needs to be approved/declined.', '');
 
@@ -88,28 +90,34 @@ exports.run = async (client, msg, args) => {
 		fetchedmessage.delete();
 
 
-		botconfs.settings.totalIssues.bugreports.declined += 1;
-		userconfs.settings.totalIssues.bugreports.declined += 1;
+		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+		botconfs.totalIssues.bugreports.declined += 1;
+		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-		userconfs.settings.totalPoints.bugreports -= 1;
+		userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+		userconfs.totalIssues.bugreports.declined += 1;
+		await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
+
+		userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+		userconfs.totalPoints.bugreports -= 1;
+		await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
 
 		msg.delete();
-
-		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
-		await client.userSettings.updateOne({ userId: issueconfs.authorid }, { $set: { settings: userconfs.settings } });
 	} else {
 		let fetchedmessage;
 		try {
-			fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(issueconfs.messageid);
+			fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 		} catch (error) {
 			return msg.delete() && msg.reply('This suggestion doesn\'t exist anymore!').then(m => m.delete(10000));
 		}
 
 		if (args.slice(1).join(' ').length > 100) return msg.delete() && msg.reply('Your decline text has to have a maxium of 100 characters!').then(m => m.delete(10000));
 
-		issueconfs.approve[msg.author.id] = args.slice(1).join(' ');
+		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+		botconfs.issues[args.slice(0, 1).join(' ')].deny[msg.author.id] = args.slice(1).join(' ');
+		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 
-		if ((Object.keys(issueconfs.deny).length + Object.keys(issueconfs.approve).length + Object.keys(issueconfs.attachments).length + Object.keys(issueconfs.notes).length - 1) === 0) {
+		if ((Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].deny).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].attachments).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].notes).length - 1) === 0) {
 			const newField = `❗❌ **${msg.author.username}:** ${args.slice(1).join(' ')}`;
 			const suggestionEmbed = new Discord.RichEmbed()
 				.setTitle(fetchedmessage.embeds[0].title)
@@ -147,7 +155,7 @@ exports.run = async (client, msg, args) => {
 
 		await msg.reply('The report was masterdeclined successfully!').then(m => m.delete(10000));
 
-		msg.guild.members.get(issueconfs.authorid).send(`Thank you for your suggestion! Your suggestion was unfortunately rejected. The reason is usually in the comments of the Issue Judgers. (🆔: ${issueconfs.reportid})`);
+		msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your suggestion! Your suggestion was unfortunately rejected. The reason is usually in the comments of the Issue Judgers. (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 		const newContent = fetchedmessage.embeds[0].description.replace('This suggestion needs to be approved/declined.', '');
 
@@ -166,15 +174,19 @@ exports.run = async (client, msg, args) => {
 		});
 		fetchedmessage.delete();
 
-		botconfs.settings.totalIssues.suggestions.declined += 1;
-		userconfs.settings.totalIssues.suggestions.declined += 1;
+		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
+		botconfs.totalIssues.suggestions.declined += 1;
+		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-		userconfs.settings.totalPoints.suggestions -= 1;
+		userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+		userconfs.totalIssues.suggestions.declined += 1;
+		await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
+
+		userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
+		userconfs.totalPoints.suggestions -= 1;
+		await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
 
 		msg.delete();
-
-		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { settings: botconfs.settings } });
-		await client.userSettings.updateOne({ userId: issueconfs.authorid }, { $set: { settings: userconfs.settings } });
 	}
 };
 

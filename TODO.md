@@ -1,1 +1,2 @@
 - [ ] Give credits when a bugreport/suggestion has been accepted!
+- [ ] createissue and edit should only be executed in the issue commands channel

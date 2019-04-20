@@ -165,15 +165,15 @@ exports.run = async (client, msg, args) => {
 				botconfs.totalIssues.bugreports.accepted += 1;
 				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 				userconfs.totalIssues.bugreports.accepted += 1;
-				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalIssues: userconfs.totalIssues } });
+				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
 
-				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 				userconfs.totalPoints.bugreports += 5;
-				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalPoints: userconfs.totalPoints } });
+				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
 
-				if (!msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.settings.totalPoints.suggestions + userconfs.settings.totalPoints.bugreports) >= 50)) {
+				if (!msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.totalPoints.suggestions + userconfs.totalPoints.bugreports) >= 50)) {
 					await msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
 					msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
 				}
@@ -329,15 +329,15 @@ exports.run = async (client, msg, args) => {
 				botconfs.totalIssues.suggestions.accepted += 1;
 				await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 				userconfs.totalIssues.suggestions.accepted += 1;
-				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalIssues: userconfs.totalIssues } });
+				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
 
-				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+				userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 				userconfs.totalPoints.suggestions += 5;
-				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalPoints: userconfs.totalPoints } });
+				await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
 
-				if (!msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.settings.totalPoints.suggestions + userconfs.settings.totalPoints.bugreports) >= 50)) {
+				if (!msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).roles.has(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger').id) && ((userconfs.totalPoints.suggestions + userconfs.totalPoints.bugreports) >= 50)) {
 					await msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).addRole(msg.guild.roles.find(r => r.name.toLowerCase() === 'issue judger'));
 					msg.guild.channels.get(settings.issueJudgersChannel).send(`${msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid)}, Welcome to the Issue Judgers! Please read the messages pinned in the channel here for an introduction!`);
 				}

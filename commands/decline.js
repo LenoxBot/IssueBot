@@ -94,18 +94,17 @@ exports.run = async (client, msg, args) => {
 			});
 			fetchedmessage.delete();
 
-
 			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
 			botconfs.totalIssues.bugreports.declined += 1;
 			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 			userconfs.totalIssues.bugreports.declined += 1;
-			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalIssues: userconfs.totalIssues } });
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
 
-			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 			userconfs.totalPoints.bugreports -= 1;
-			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalPoints: userconfs.totalPoints } });
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
 		}
 		msg.delete();
 	} else {
@@ -189,13 +188,13 @@ exports.run = async (client, msg, args) => {
 			botconfs.totalIssues.suggestions.declined += 1;
 			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 			userconfs.totalIssues.suggestions.declined += 1;
-			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalIssues: userconfs.totalIssues } });
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalIssues: userconfs.totalIssues } });
 
-			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid });
+			userconfs = await client.userSettings.findOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid });
 			userconfs.totalPoints.suggestions -= 1;
-			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].reportid }, { $set: { totalPoints: userconfs.totalPoints } });
+			await client.userSettings.updateOne({ userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid }, { $set: { totalPoints: userconfs.totalPoints } });
 		}
 		msg.delete();
 	}
