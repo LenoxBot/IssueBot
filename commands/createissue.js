@@ -6,7 +6,7 @@ exports.run = async (client, msg) => {
 
 	let botconfs;
 	let userconfs;
-	const userconfs = await client.userSettings.findOne({ userId: msg.author.id });
+	let issueID;
 
 	const bugreportAnswers = [];
 	const suggestionAnswers = [];
@@ -41,6 +41,7 @@ exports.run = async (client, msg) => {
 
 		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
 		botconfs.issuescount += 1;
+		issueID = botconfs.issuescount;
 		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issuescount: botconfs.issuescount } });
 
 		let messageSentToIssueJudges;
@@ -70,7 +71,7 @@ exports.run = async (client, msg) => {
 			const bugreportembed = new Discord.RichEmbed()
 				.setColor('BLUE')
 				.setTitle(`📢 Bug reported by ${msg.author.username} (${msg.author.id})`)
-				.setDescription(`This bugreport needs to be approved/declined. \n**🆔: ${botconfs.settings.issuescount}**`);
+				.setDescription(`This bugreport needs to be approved/declined. \n**🆔: ${issueID}**`);
 
 			for (let index = 0; index < client.bugreportQuestions.questions.length; index++) {
 				bugreportembed.addField(client.bugreportQuestions.questions[index].question, bugreportAnswers[index]);
@@ -92,7 +93,9 @@ exports.run = async (client, msg) => {
 			botconfs.totalIssues.bugreports.total += 1;
 			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-			userconfs.settings.totalIssues.bugreports.total += 1;
+			userconfs = await client.userSettings.findOne({ userId: msg.author.id });
+			userconfs.totalIssues.bugreports.total += 1;
+			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { totalIssues: botconfs.totalIssues } });
 		} else {
 			for (let i = 0; i < client.suggestionQuestions.questions.length; i++) {
 				try {
@@ -119,13 +122,13 @@ exports.run = async (client, msg) => {
 			const suggestionembed = new Discord.RichEmbed()
 				.setColor('BLUE')
 				.setTitle(`📢 Suggestion proposed by ${msg.author.username} (${msg.author.id})`)
-				.setDescription(`This suggestion needs to be approved/declined. \n**🆔: ${botconfs.settings.issuescount}**`);
+				.setDescription(`This suggestion needs to be approved/declined. \n**🆔: ${issueID}**`);
 
 			for (let index = 0; index < client.suggestionQuestions.questions.length; index++) {
 				suggestionembed.addField(client.suggestionQuestions.questions[index].question, suggestionAnswers[index]);
 			}
 
-			messageSentToIssueJudges = processingSuggestionsChannel.send({
+			messageSentToIssueJudges = await processingSuggestionsChannel.send({
 				embed: suggestionembed
 			});
 
@@ -139,12 +142,14 @@ exports.run = async (client, msg) => {
 			botconfs.totalIssues.suggestions.total += 1;
 			await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { totalIssues: botconfs.totalIssues } });
 
-			userconfs.settings.totalIssues.suggestions.total += 1;
+			userconfs = await client.userSettings.findOne({ userId: msg.author.id });
+			userconfs.totalIssues.suggestions.total += 1;
+			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { totalIssues: botconfs.totalIssues } });
 		}
 
 		botconfs = client.botSettings.findOne({ botconfs: 'botconfs' });
 		const issueSettings = {
-			reportid: botconfs.issuescount,
+			reportid: issueID,
 			messageid: messageSentToIssueJudges.id,
 			authorid: msg.author.id,
 			attachments: {},
@@ -162,7 +167,7 @@ exports.run = async (client, msg) => {
 		};
 
 		botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
-		botconfs.issues[botconfs.settings.issuescount] = issueSettings
+		botconfs.issues[issueID] = issueSettings;
 		await client.botSettings.updateOne({ botconfs: 'botconfs' }, { $set: { issues: botconfs.issues } });
 	});
 };
