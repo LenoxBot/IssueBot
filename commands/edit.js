@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const settings = require('./../settings.json');
 
 exports.run = async (client, msg, args) => {
+	if (settings.createIssuesChannel !== msg.channel.id) return msg.delete() && msg.reply(`You have to execute this command in <#${settings.createIssuesChannel}>!`);
 	const arrayOfEmojiNumbers = ['1⃣', '2⃣', '3⃣', '4⃣'];
 
 	const input = args.slice(0, 1);

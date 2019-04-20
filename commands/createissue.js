@@ -2,7 +2,8 @@ const Discord = require('discord.js');
 const settings = require('./../settings.json');
 
 exports.run = async (client, msg) => {
-	if (msg.guild.id !== settings.lenoxbotDiscordServer) return msg.channel.send('The bugreport must be written to the LenoxBot Discord server!');
+	if (msg.guild.id !== settings.lenoxbotDiscordServer) return msg.channel.send('The issue must be written to the LenoxBot Discord server!');
+	if (settings.createIssuesChannel !== msg.channel.id) return msg.delete() && msg.reply(`You have to execute this command in <#${settings.createIssuesChannel}>!`);
 
 	let botconfs;
 	let userconfs;

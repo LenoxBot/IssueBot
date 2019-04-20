@@ -25,7 +25,7 @@ exports.run = async (client, msg, args) => {
 		try {
 			fetchedmessage = await client.channels.get(settings.processingBugreportsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 		} catch (error) {
-			msg.reply('This bugreport doesn\'t exist anymore').then(m => m.delete(10000));
+			return msg.delete() && msg.reply('This bugreport doesn\'t exist anymore').then(m => m.delete(10000));
 		}
 
 		if ((Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].deny).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].attachments).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].notes).length - 1) === 0) {
@@ -70,7 +70,7 @@ exports.run = async (client, msg, args) => {
 		try {
 			fetchedmessage = await client.channels.get(settings.processingSuggestionsChannel).fetchMessage(botconfs.issues[args.slice(0, 1).join(' ')].messageid);
 		} catch (error) {
-			msg.reply('This suggestion doesn\'t exist anymore').then(m => m.delete(10000));
+			return msg.delete() && msg.reply('This suggestion doesn\'t exist anymore').then(m => m.delete(10000));
 		}
 
 		if ((Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].deny).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].attachments).length + Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].notes).length - 1) === 0) {
