@@ -95,7 +95,7 @@ exports.run = async (client, msg) => {
 
 			userconfs = await client.userSettings.findOne({ userId: msg.author.id });
 			userconfs.totalIssues.bugreports.total += 1;
-			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { totalIssues: botconfs.totalIssues } });
+			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { totalIssues: userconfs.totalIssues } });
 		} else {
 			for (let i = 0; i < client.suggestionQuestions.questions.length; i++) {
 				try {
@@ -144,7 +144,7 @@ exports.run = async (client, msg) => {
 
 			userconfs = await client.userSettings.findOne({ userId: msg.author.id });
 			userconfs.totalIssues.suggestions.total += 1;
-			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { totalIssues: botconfs.totalIssues } });
+			await client.userSettings.updateOne({ userId: msg.author.id }, { $set: { totalIssues: userconfs.totalIssues } });
 		}
 
 		botconfs = client.botSettings.findOne({ botconfs: 'botconfs' });
