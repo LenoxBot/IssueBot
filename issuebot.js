@@ -62,17 +62,17 @@ client.bugreportQuestions = {
 	questions: [{
 		question: 'What is the title of your bugreport?',
 		minChars: 15,
-		maxChars: 50
+		maxChars: 100
 	},
 	{
 		question: 'How can you reproduce the bug?',
 		minChars: 30,
-		maxChars: 300
+		maxChars: 600
 	},
 	{
 		question: 'Which result would normally have to be?',
 		minChars: 30,
-		maxChars: 300
+		maxChars: 600
 	}]
 };
 
@@ -80,17 +80,17 @@ client.suggestionQuestions = {
 	questions: [{
 		question: 'What is the title of your suggestion?',
 		minChars: 15,
-		maxChars: 50
+		maxChars: 100
 	},
 	{
 		question: 'Explain your suggestion more accurately (It\'s best to give as much information as possible, so that we can implement the suggestion better)',
 		minChars: 30,
-		maxChars: 300
+		maxChars: 600
 	},
 	{
 		question: 'Why should we add this feature?',
 		minChars: 30,
-		maxChars: 300
+		maxChars: 600
 	}]
 };
 

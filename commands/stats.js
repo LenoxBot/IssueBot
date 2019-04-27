@@ -1,5 +1,8 @@
 const Discord = require('discord.js');
+const settings = require('./../settings.json');
+
 exports.run = async (client, msg) => {
+	if (msg.channel.id === settings.processingBugreportsChannel || msg.channel.id === settings.processingSuggestionsChannel) return;
 	const user1 = msg.mentions.users.first() || msg.author;
 	const userconfs = await client.userSettings.findOne({ userId: user1.id });
 
