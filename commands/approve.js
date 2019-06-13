@@ -146,8 +146,25 @@ exports.run = async (client, msg, args) => {
 					GitHubIssue.labels.push('p: low');
 				}
 
-				const LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
-				const createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				if (botconfs.issues[args.slice(0, 1).join(' ')].category) {
+					if (botconfs.issues[args.slice(0, 1).join(' ')].category === 'website') {
+						GitHubIssue.labels.push('meta: website');
+					}
+
+					if (botconfs.issues[args.slice(0, 1).join(' ')].category === 'lenoxbot') {
+						GitHubIssue.labels.push('meta: bot');
+					}
+				}
+
+				let createdIssue;
+				let LenoxBotIssues;
+				if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'issuebot') {
+					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'IssueBot');
+					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				} else {
+					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
+					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				}
 
 				newEmbed.setURL(createdIssue.data.html_url);
 
@@ -310,8 +327,25 @@ exports.run = async (client, msg, args) => {
 					GitHubIssue.labels.push('p: low');
 				}
 
-				const LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
-				const createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				if (botconfs.issues[args.slice(0, 1).join(' ')].category) {
+					if (botconfs.issues[args.slice(0, 1).join(' ')].category === 'website') {
+						GitHubIssue.labels.push('meta: website');
+					}
+
+					if (botconfs.issues[args.slice(0, 1).join(' ')].category === 'lenoxbot') {
+						GitHubIssue.labels.push('meta: bot');
+					}
+				}
+
+				let createdIssue;
+				let LenoxBotIssues;
+				if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'issuebot') {
+					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'IssueBot');
+					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				} else {
+					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
+					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				}
 
 				newEmbed.setURL(createdIssue.data.html_url);
 
