@@ -113,7 +113,7 @@ exports.run = async (client, msg, args) => {
 			await msg.reply('The report was approved successfully!').then(m => m.delete(10000));
 
 			if (Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length >= 3) {
-				msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your bugreport! Your bugreport has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
+				msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your **bugreport**! Your bugreport **"${fetchedmessage.embeds[0].fields[0].value}"** has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 				const newContent = fetchedmessage.embeds[0].description.replace('This bugreport needs to be approved/declined.', '');
 
@@ -294,7 +294,7 @@ exports.run = async (client, msg, args) => {
 			await msg.reply('The report was approved successfully!').then(m => m.delete(10000));
 
 			if (Object.keys(botconfs.issues[args.slice(0, 1).join(' ')].approve).length >= 3) {
-				msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your suggestion! Your suggestion has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
+				msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your **suggestion**! Your suggestion **"${fetchedmessage.embeds[0].fields[0].value}"** has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 				const newContent = fetchedmessage.embeds[0].description.replace('This suggestion needs to be approved/declined.', '');
 
