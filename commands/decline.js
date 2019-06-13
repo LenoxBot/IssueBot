@@ -172,7 +172,7 @@ exports.run = async (client, msg, args) => {
 			const newTitle = fetchedmessage.embeds[0].title.replace('📢', '❌');
 			const newEmbed = new Discord.RichEmbed()
 				.setTitle(newTitle)
-				.setColor('GREEN')
+				.setColor('RED')
 				.setDescription(newContent);
 
 			for (let i = 0; i < fetchedmessage.embeds[0].fields.length; i++) {
