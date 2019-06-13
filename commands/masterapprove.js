@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const settings = require('./../settings.json');
+const axios = require('axios');
 
 exports.run = async (client, msg, args) => {
 	if (!settings.moderators.includes(msg.author.id) && !settings.owners.includes(msg.author.id)) return;
@@ -108,6 +109,14 @@ exports.run = async (client, msg, args) => {
 
 			await msg.reply('The report was masterapproved successfully!').then(m => m.delete(10000));
 
+			await axios.post('https://lenoxbot.com/api/newacceptedissue', {
+				authorization: settings.authForAPI,
+				userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid,
+				credits: 200
+			}).catch(error => {
+				console.error(error);
+			});
+
 			msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your **bugreport**! Your bugreport **"${fetchedmessage.embeds[0].fields[0].value}"** has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 			const newContent = fetchedmessage.embeds[0].description.replace('This bugreport needs to be approved/declined.', '');
@@ -155,7 +164,6 @@ exports.run = async (client, msg, args) => {
 			let LenoxBotIssues;
 			if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'issuebot') {
 				LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'IssueBot');
-				console.log(GitHubIssue)
 				createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
 			} else {
 				LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
@@ -282,6 +290,14 @@ exports.run = async (client, msg, args) => {
 
 			await msg.reply('The report was masterapproved successfully!').then(m => m.delete(10000));
 
+			await axios.post('https://lenoxbot.com/api/newacceptedissue', {
+				authorization: settings.authForAPI,
+				userId: botconfs.issues[args.slice(0, 1).join(' ')].authorid,
+				credits: 200
+			}).catch(error => {
+				console.error(error);
+			});
+
 			msg.guild.members.get(botconfs.issues[args.slice(0, 1).join(' ')].authorid).send(`Thank you for your **suggestion**! Your suggestion **"${fetchedmessage.embeds[0].fields[0].value}"** has been accepted and will be processed as soon as possible. As a thank, you got 200 credits! (🆔: ${botconfs.issues[args.slice(0, 1).join(' ')].reportid})`);
 
 			const newContent = fetchedmessage.embeds[0].description.replace('This suggestion needs to be approved/declined.', '');
@@ -329,7 +345,6 @@ exports.run = async (client, msg, args) => {
 			let LenoxBotIssues;
 			if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'issuebot') {
 				LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'IssueBot');
-				console.log(GitHubIssue)
 				createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
 			} else {
 				LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
