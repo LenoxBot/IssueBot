@@ -14,7 +14,7 @@ exports.run = async (client, msg, args) => {
 	botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
 	if (!botconfs.issues.hasOwnProperty(input.join(' '))) return msg.delete() && msg.reply('This issue does not exist!').then(m => m.delete(10000));
 
-	if (botconfs.issues[args.slice(0, 1).join(' ')].notes.hasOwnProperty(msg.author.id)) return msg.delete() && msg.reply('You have already added a note this report').then(m => m.delete(10000));
+	if (botconfs.issues[args.slice(0, 1).join(' ')].notes.hasOwnProperty(msg.author.id)) return msg.delete() && msg.reply('You have already added a note to this report').then(m => m.delete(10000));
 
 	botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
 	botconfs.issues[args.slice(0, 1).join(' ')].notes[msg.author.id] = args.slice(1).join(' ');
