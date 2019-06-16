@@ -42,13 +42,14 @@ exports.run = async (client, msg) => {
 		if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 		const categoryMessageEmbed = new Discord.RichEmbed()
-			.setDescription('What is this issue about? \n🔴 = LenoxBot \n🔵 = IssueBot \n⚫ = Website \n\nPlease react to the reaction that best suits this issue!')
+			.setDescription('What is this issue about? \n🔴 = LenoxBot \n🔵 = IssueBot \n⚫ = Website \n⚪ = Documentation \n\nPlease react to the reaction that best suits this issue!')
 			.setColor('BLUE');
 
 		const categoryMessage = await msg.reply({ embed: categoryMessageEmbed });
 		await categoryMessage.react('🔴');
 		await categoryMessage.react('🔵');
 		await categoryMessage.react('⚫');
+		await categoryMessage.react('⚪');
 
 		const collector2 = categoryMessage.createReactionCollector((reaction, user) => user.id === msg.author.id, {
 			time: 30000
@@ -66,10 +67,14 @@ exports.run = async (client, msg) => {
 				issueCategory = 'website';
 				collector2.stop();
 			}
+			if (r.emoji.name === '⚪') {
+				issueCategory = 'documentation';
+				collector2.stop();
+			}
 		});
 
 		collector2.on('end', async (collected, reason) => {
-			typeMessage.delete();
+			categoryMessage.delete();
 			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });

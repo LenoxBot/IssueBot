@@ -170,6 +170,9 @@ exports.run = async (client, msg, args) => {
 				if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'issuebot') {
 					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'IssueBot');
 					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				} else if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'documentation') {
+					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot-Docs');
+					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
 				} else {
 					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
 					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
@@ -358,6 +361,9 @@ exports.run = async (client, msg, args) => {
 				let LenoxBotIssues;
 				if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'issuebot') {
 					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'IssueBot');
+					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
+				} else if (botconfs.issues[args.slice(0, 1).join(' ')].category && botconfs.issues[args.slice(0, 1).join(' ')].category === 'documentation') {
+					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot-Docs');
 					createdIssue = await LenoxBotIssues.createIssue(GitHubIssue);
 				} else {
 					LenoxBotIssues = await client.GitHub.getIssues('LenoxBot', 'LenoxBot');
