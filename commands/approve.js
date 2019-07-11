@@ -414,7 +414,7 @@ exports.conf = {
 
 exports.help = {
 	name: 'approve',
-	description: 'You can submit a new bugreport by using this command',
+	description: 'Approves an issue',
 	usage: 'bugreport {title of the bugreport} | {description}',
 	example: ['bugreport ping command bug | There is just written ping but not how many ms this message needed to send'],
 	category: 'trello',
