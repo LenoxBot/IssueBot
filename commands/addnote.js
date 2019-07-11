@@ -117,7 +117,8 @@ exports.conf = {
 	enabled: true,
 	guildOnly: true,
 	aliases: [],
-	userpermissions: []
+	userpermissions: [],
+	issuejudger: true
 };
 
 exports.help = {
