@@ -23,12 +23,16 @@ exports.run = async (client, msg) => {
 	const typeMessage = await msg.reply({ embed: typeMessageEmbed });
 	await typeMessage.react('🔴');
 	await typeMessage.react('🔵');
+	await typeMessage.react('❌');
 
 	const collector = typeMessage.createReactionCollector((reaction, user) => user.id === msg.author.id, {
 		time: 30000
 	});
 	collector.on('collect', r => {
-		if (r.emoji.name === '🔴') {
+		if (r.emoji.name === '❌') {
+			collector.stop('cancel');
+			return msg.reply('You successfully cancelled the issue!');
+		} else if (r.emoji.name === '🔴') {
 			typeIssue = 'suggestion';
 			collector.stop();
 		} else {
@@ -39,6 +43,7 @@ exports.run = async (client, msg) => {
 
 	collector.on('end', async (collected, reason) => {
 		typeMessage.delete();
+		if (reason === 'cancel') return;
 		if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 		const categoryMessageEmbed = new Discord.RichEmbed()
@@ -50,11 +55,16 @@ exports.run = async (client, msg) => {
 		await categoryMessage.react('🔵');
 		await categoryMessage.react('⚫');
 		await categoryMessage.react('⚪');
+		await categoryMessage.react('❌');
 
 		const collector2 = categoryMessage.createReactionCollector((reaction, user) => user.id === msg.author.id, {
 			time: 30000
 		});
 		collector2.on('collect', r => {
+			if (r.emoji.name === '❌') {
+				collector2.stop('cancel');
+				return msg.reply('You successfully cancelled the issue!');
+			}
 			if (r.emoji.name === '🔴') {
 				issueCategory = 'lenoxbot';
 				collector2.stop();
@@ -75,6 +85,7 @@ exports.run = async (client, msg) => {
 
 		collector2.on('end', async (collected, reason) => {
 			categoryMessage.delete();
+			if (reason === 'cancel') return;
 			if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 			botconfs = await client.botSettings.findOne({ botconfs: 'botconfs' });
@@ -88,15 +99,29 @@ exports.run = async (client, msg) => {
 					try {
 						const questionEmbed = new Discord.RichEmbed()
 							.setTitle(client.bugreportQuestions.questions[i].question)
-							.setFooter(`Min. characters: ${client.bugreportQuestions.questions[i].minChars}, Max. characters: ${client.bugreportQuestions.questions[i].maxChars}`)
+							.setFooter(`Min. characters: ${client.bugreportQuestions.questions[i].minChars}, Max. characters: ${client.bugreportQuestions.questions[i].maxChars} || Type "cancel" to cancel the issue`)
 							.setColor('BLUE');
 
 						const questionMessage = await msg.reply({ embed: questionEmbed });
-						const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= client.bugreportQuestions.questions[i].maxChars && msg2.content.length >= client.bugreportQuestions.questions[i].minChars, {
+						const response = await msg.channel.awaitMessages(msg2 => {
+							if (msg2.attachments.size !== 0) return;
+							if (msg.author.id !== msg2.author.id) return;
+							if (msg2.author.bot) return;
+							if (msg2.content.toLowerCase() !== 'cancel') {
+								if (msg2.content.length > client.bugreportQuestions.questions[i].maxChars) return;
+								if (msg2.content.length < client.bugreportQuestions.questions[i].minChars) return;
+							}
+							return true;
+						}, {
 							maxMatches: 1,
 							time: 600000,
 							errors: ['time']
 						});
+
+						if (response.first().content.toLowerCase() === 'cancel') {
+							return msg.reply('You successfully cancelled the bugreport!');
+						}
+
 						bugreportAnswers.push(response.first().content);
 						await response.first().delete();
 						await questionMessage.delete();
@@ -143,11 +168,25 @@ exports.run = async (client, msg) => {
 							.setColor('BLUE');
 
 						const questionMessage = await msg.reply({ embed: questionEmbed });
-						const response = await msg.channel.awaitMessages(msg2 => msg2.attachments.size === 0 && msg.author.id === msg2.author.id && !msg2.author.bot && msg2.content.length <= client.suggestionQuestions.questions[i].maxChars && msg2.content.length >= client.suggestionQuestions.questions[i].minChars, {
+						const response = await msg.channel.awaitMessages(msg2 => {
+							if (msg2.attachments.size !== 0) return;
+							if (msg.author.id !== msg2.author.id) return;
+							if (msg2.author.bot) return;
+							if (msg2.content.toLowerCase() !== 'cancel') {
+								if (msg2.content.length > client.suggestionQuestions.questions[i].maxChars) return;
+								if (msg2.content.length < client.suggestionQuestions.questions[i].minChars) return;
+							}
+							return true;
+						}, {
 							maxMatches: 1,
 							time: 600000,
 							errors: ['time']
 						});
+
+						if (response.first().content.toLowerCase() === 'cancel') {
+							return msg.reply('You successfully cancelled the suggestion!');
+						}
+
 						suggestionAnswers.push(response.first().content);
 						await response.first().delete();
 						await questionMessage.delete();
