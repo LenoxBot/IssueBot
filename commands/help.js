@@ -13,7 +13,6 @@ exports.run = async (client, msg) => {
 	const issueJudgerAdminCommands = [];
 
 	for (const index of client.commands) {
-		console.log(index[1], 1111)
 		if (index[1].conf.issuejudger) {
 			issueJudgerCommands.push(index[1]);
 		} else if (index[1].conf.issuejudgeradmin) {
