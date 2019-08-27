@@ -47,7 +47,7 @@ exports.run = async (client, msg) => {
 		if (reason === 'time') return msg.delete() && msg.reply('You didn\'t react to the message').then(m => m.delete(10000));
 
 		const categoryMessageEmbed = new Discord.RichEmbed()
-			.setDescription('What is this issue about? \n🔴 = LenoxBot \n🔵 = IssueBot \n⚫ = Website \n⚪ = Documentation \n\nPlease react to the reaction that best suits this issue!')
+			.setDescription('What is this issue about? \n🔴 = LenoxBot \n🔵 = IssueBot \n⚫ = Website \n⚪ = Documentation \n🔶 = LenoxBot Beta \n\nPlease react to the reaction that best suits this issue!')
 			.setColor('BLUE');
 
 		const categoryMessage = await msg.reply({ embed: categoryMessageEmbed });
@@ -55,6 +55,7 @@ exports.run = async (client, msg) => {
 		await categoryMessage.react('🔵');
 		await categoryMessage.react('⚫');
 		await categoryMessage.react('⚪');
+		await categoryMessage.react('🔶');
 		await categoryMessage.react('❌');
 
 		const collector2 = categoryMessage.createReactionCollector((reaction, user) => user.id === msg.author.id, {
@@ -79,6 +80,10 @@ exports.run = async (client, msg) => {
 			}
 			if (r.emoji.name === '⚪') {
 				issueCategory = 'documentation';
+				collector2.stop();
+			}
+			if (r.emoji.name === '🔶') {
+				issueCategory = 'lenoxbotbeta';
 				collector2.stop();
 			}
 		});
