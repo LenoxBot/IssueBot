@@ -158,6 +158,10 @@ exports.run = async (client, msg, args) => {
 				if (botconfs.issues[args.slice(0, 1).join(' ')].category === 'lenoxbot') {
 					GitHubIssue.labels.push('meta: bot');
 				}
+
+				if (botconfs.issues[args.slice(0, 1).join(' ')].category === 'lenoxbotbeta') {
+					GitHubIssue.labels.push('v: beta');
+				}
 			}
 
 			let createdIssue;
