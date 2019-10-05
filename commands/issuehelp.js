@@ -39,7 +39,7 @@ exports.conf = {
 };
 
 exports.help = {
-	name: 'help',
+	name: 'issuehelp',
 	description: 'List of all commands',
 	usage: 'bugreport {title of the bugreport} | {description}',
 	example: ['bugreport ping command bug | There is just written ping but not how many ms this message needed to send'],
