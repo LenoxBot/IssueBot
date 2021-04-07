@@ -9,7 +9,7 @@
     "discord.js": "^11.4.2",
     "fs": "^0.0.1-security",
     "github-api": "^3.3.0",
-    "mongodb": "^3.2.7"
+    "mongodb": "^3.6.6"
   },
   "devDependencies": {},
   "scripts": {
